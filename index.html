@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ذاكرني - مساعدك الدراسي الذكي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary-color: #6a66f1; --secondary-color: #8b5cf6; --accent-color: #10b981; --danger-color: #ef4444; --warning-color: #f59e0b; --info-color: #3b82f6; --gemini-color: #8e44ad; --bg-main: #f3f4f6; --bg-section: #ffffff; --bg-alt: #e5e7eb; --text-primary: #1f2937; --text-secondary: #4b5563; --text-muted: #6b7280; --border-color: #d1d5db; --shadow-color: rgba(106, 102, 241, 0.1); --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); --gradient-accent: linear-gradient(135deg, var(--accent-color) 0%, #14b8a6 100%); --gradient-danger: linear-gradient(135deg, var(--danger-color) 0%, #f76a6a 100%); --gradient-warning: linear-gradient(135deg, var(--warning-color) 0%, #f59e0b 100%); --gradient-gemini: linear-gradient(135deg, var(--gemini-color) 0%, #9b59b6 100%); --radius-md: 16px; --radius-lg: 24px; --transition: 0.3s ease; }
+        [data-theme="dark"] { --primary-color: #818cf8; --secondary-color: #a78bfa; --accent-color: #34d399; --danger-color: #f87171; --gemini-color: #a569bd; --bg-main: #111827; --bg-section: #1f2937; --bg-alt: #374151; --text-primary: #f9fafb; --text-secondary: #d1d5db; --text-muted: #9ca3af; --border-color: #4b5563; --shadow-color: rgba(0, 0, 0, 0.25); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-main); color: var(--text-primary); min-height: 100vh; line-height: 1.7; padding-bottom: 100px; transition: background-color var(--transition), color var(--transition); }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .screen { display: none; animation: fadeIn 0.5s ease-out; }
+        .screen.active { display: block; }
+        h1, h2 { text-align: center; margin-bottom: 25px; font-weight: 800; }
+        h1 { font-size: 2rem; color: var(--primary-color); }
+        h2 { font-size: 1.6rem; color: var(--text-primary); position: relative; }
+        .section { background: var(--bg-section); margin-bottom: 25px; padding: clamp(1.5rem, 5vw, 2rem); border-radius: var(--radius-lg); box-shadow: 0 10px 30px var(--shadow-color); }
+        label { display: block; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; }
+        input, select, textarea { width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: var(--radius-md); font-size: 1rem; font-family: 'Cairo', sans-serif; background: var(--bg-alt); color: var(--text-primary); transition: all var(--transition); }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-color) 20%, transparent); }
+        .btn { background: var(--gradient-primary); color: white; border: none; padding: 14px 28px; border-radius: var(--radius-md); font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; position: relative; overflow: hidden; }
+        .btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 20px color-mix(in srgb, var(--primary-color) 30%, transparent); }
+        .btn:disabled { background: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-accent { background: var(--gradient-accent); }
+        .btn-danger { background: var(--gradient-danger); }
+        .btn-gemini { background: var(--gradient-gemini); }
+        .btn-sm { padding: 8px 16px; font-size: 0.9rem; border-radius: 12px;}
+        .empty-state { text-align: center; padding: 50px; color: var(--text-muted); font-size: 1.1rem; }
+        .loading-skeleton { background-color: var(--bg-alt); border-radius: var(--radius-md); min-height: 100px; animation: pulse 1.5s infinite; }
+        .next-exam-card { background: var(--gradient-primary); color: white; padding: 25px; border-radius: var(--radius-lg); text-align: center; margin-bottom: 25px; }
+        #countdown { font-size: 1.8rem; font-weight: 800; margin: 10px 0; letter-spacing: 2px; }
+        .exam-item { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px; background: var(--bg-section); margin-bottom: 15px; padding: 20px; border-radius: var(--radius-md); border-inline-start: 6px solid var(--info-color); }
+        .exam-item.urgent { border-inline-start-color: var(--warning-color); }
+        .exam-item.tbd { border-inline-start-color: var(--text-muted); }
+        .exam-item-buttons { display:flex; gap:10px; }
+        .lesson-card { background: var(--bg-section); padding: 25px; border-radius: var(--radius-lg); text-align: center; }
+        .lesson-images { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;}
+        .lesson-images img { width: 100%; height: 120px; object-fit: cover; border-radius: var(--radius-md); box-shadow: 0 5px 15px var(--shadow-color); cursor: pointer; transition: transform var(--transition); }
+        .lesson-images img:hover { transform: scale(1.05); }
+        .lesson-card-actions { display: flex; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        #lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        #lightbox.show { display: flex; animation: fadeIn 0.3s; }
+        #lightbox img { max-width: 90%; max-height: 80%; object-fit: contain; }
+        #lightbox .close { position: absolute; top: 30px; right: 30px; color: white; font-size: 3rem; cursor: pointer; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1500; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-content { background: var(--bg-section); padding: 30px; border-radius: var(--radius-lg); width: 100%; max-width: 600px; animation: slideUpModal 0.4s ease-out; max-height: 90vh; overflow-y: auto;}
+        .modal-content h2 { margin-top: 0; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: color-mix(in srgb, var(--bg-section) 90%, transparent); backdrop-filter: blur(10px); box-shadow: 0 -5px 20px var(--shadow-color); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; border-top: 1px solid var(--border-color); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); text-decoration: none; padding: 5px 15px; border-radius: var(--radius-md); transition: all var(--transition); cursor: pointer; }
+        .nav-item .icon { font-size: 1.8rem; }
+        .nav-item.active { color: var(--primary-color); transform: translateY(-5px); }
+        .settings-toggle { position: fixed; top: 1rem; inset-inline-end: 1rem; background: var(--bg-section); color: var(--text-secondary); border: none; width: 45px; height: 45px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; z-index: 1001; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px var(--shadow-color); }
+        .filters { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; }
+        .filter-btn { background: var(--bg-alt); border: 2px solid transparent; padding: 8px 16px; border-radius: 99px; cursor: pointer; transition: all var(--transition); white-space: nowrap; }
+        .filter-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .overall-progress { margin: 25px 0; }
+        .progress-info { display: flex; justify-content: space-between; margin-bottom: 10px; font-weight: 700; }
+        .setting-item { display:flex; align-items:center; justify-content:space-between; }
+        .setting-item-label { display: flex; flex-direction: column; }
+        .setting-item-label small { font-size: 0.8rem; color: var(--text-muted); font-weight: normal; }
+        .toggle-switch-container input[type="checkbox"] { visibility: hidden; width: 0; height: 0; }
+        .toggle-switch-container .slider { cursor: pointer; width: 50px; height: 28px; background: var(--text-muted); display: block; border-radius: 100px; position: relative; }
+        .toggle-switch-container .slider:after { content: ''; position: absolute; top: 3px; inset-inline-start: 3px; width: 22px; height: 22px; background: #fff; border-radius: 90px; transition: 0.3s; }
+        .toggle-switch-container input:checked + .slider { background: var(--primary-color); }
+        .toggle-switch-container input:checked + .slider:after { inset-inline-start: calc(100% - 3px); transform: translateX(-100%); }
+        #alertContainer { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); z-index: 2000; width: 90%; max-width: 500px; }
+        .alert { padding: 15px; border-radius: 16px; margin-bottom: 10px; box-shadow: 0 5px 15px var(--shadow-color); animation: slideUp 0.5s ease-out; background-color: var(--accent-color); color: white; text-align: center; }
+        .alert.error { background-color: var(--danger-color); }
+        #image-preview-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 15px; }
+        .preview-image-wrapper { position: relative; }
+        .preview-image-wrapper img { width: 100%; height: 80px; object-fit: cover; border-radius: var(--radius-md); }
+        .preview-image-wrapper .remove-img-btn { position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); transition: all var(--transition); }
+        .preview-image-wrapper .remove-img-btn:hover { transform: scale(1.1); background: #c13a3a; }
+        #gamify-screen .btn { width: 100%; }
+        #gamify-screen h2::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 50px; height: 3px; background: var(--gradient-accent); border-radius: 2px; }
+        #gamify-screen .btn.studying { background: var(--gradient-danger); animation: pulse-btn 2s infinite; }
+        #gamify-screen .btn.studying:hover { box-shadow: 0 8px 25px color-mix(in srgb, var(--danger-color) 30%, transparent); }
+        @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--danger-color) 40%, transparent); } 70% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--danger-color) 0%, transparent); } 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--danger-color) 0%, transparent); } }
+        .timer-display { font-size: 3rem; font-weight: 800; color: var(--primary-color); margin: 20px 0; font-family: 'Courier New', monospace, 'Cairo'; text-shadow: 0 2px 4px color-mix(in srgb, var(--primary-color) 20%, transparent); letter-spacing: 2px; }
+        .timer-display.active { color: var(--danger-color); animation: timerGlow 2s ease-in-out infinite alternate; }
+        @keyframes timerGlow { from { text-shadow: 0 0 10px color-mix(in srgb, var(--danger-color) 50%, transparent); } to { text-shadow: 0 0 20px color-mix(in srgb, var(--danger-color) 80%, transparent), 0 0 30px color-mix(in srgb, var(--danger-color) 30%, transparent); } }
+        .stats-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-top: 25px; }
+        .stat-card { background: var(--bg-alt); padding: 25px 20px; border-radius: var(--radius-md); text-align: center; }
+        .stat-time { font-size: 2rem; font-weight: 800; color: var(--primary-color); letter-spacing: 1px; font-family: 'Courier New', monospace, 'Cairo'; margin: 10px 0; }
+        .stat-label { color: var(--text-secondary); font-size: 0.95rem; font-weight: 600; margin-bottom: 5px; }
+        .streak-card { background: var(--gradient-warning); color: #422006; padding: 30px; text-align: center; border-radius: var(--radius-lg); position: relative; overflow: hidden; transition: var(--transition); }
+        .streak-card::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='m0 40l40-40h-40v40z'/%3E%3C/g%3E%3C/svg%3E"); pointer-events: none; }
+        [data-theme="dark"] .streak-card { color: #fef3c7; }
+        .streak-card:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 40px color-mix(in srgb, var(--warning-color) 30%, transparent); }
+        .streak-card .icon { font-size: 4rem; line-height: 1; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2)); animation: bounce 2s infinite; }
+        .streak-card .stat-label { font-size: 1.3rem; margin: 15px 0 8px; font-weight: 800; color: inherit; }
+        .streak-card .stat-number { font-size: 3.5rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
+        .daily-goal { background: var(--gradient-primary); color: white; padding: 20px; border-radius: var(--radius-md); text-align: center; margin-top: 20px; }
+        .progress-bar { background: rgba(255, 255, 255, 0.2); height: 8px; border-radius: 4px; margin: 15px 0; overflow: hidden; }
+        .progress-fill { background: white; height: 100%; border-radius: 4px; transition: width 0.5s ease; box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
+        .quick-note-item { display: flex; justify-content: space-between; align-items: center; gap: 15px; background-color: var(--bg-alt); padding: 15px; border-radius: var(--radius-md); margin-bottom: 10px;}
+        .quick-note-item p { margin: 0; flex-grow: 1; }
+        .gemini-output { white-space: pre-wrap; background-color: var(--bg-alt); padding: 15px; border-radius: var(--radius-md); margin-top: 15px; text-align: right; line-height: 1.8; }
+        .quiz-option { display: block; margin: 10px 0; }
+        .quiz-result { margin-top: 10px; font-weight: bold; }
+        .quiz-result.correct { color: var(--accent-color); }
+        .quiz-result.incorrect { color: var(--danger-color); }
+        .flashcard-container { perspective: 1000px; width: 100%; height: 250px; }
+        .flashcard { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
+        .flashcard.is-flipped { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; padding: 20px; border-radius: var(--radius-lg); font-size: 1.2rem; text-align: center; }
+        .flashcard-front { background: var(--gradient-primary); color: white; }
+        .flashcard-back { background: var(--gradient-accent); color: white; transform: rotateY(180deg); }
+        .flashcard-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+        .flashcard-counter { font-weight: bold; }
+        .loader { width: 25px; height: 25px; border: 4px solid var(--primary-color); border-bottom-color: transparent; border-radius: 50%; display: inline-block; box-sizing: border-box; animation: rotation 1s linear infinite; margin: 20px auto; display: block;}
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUpModal { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; translateY(0); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    </style>
+</head>
+<body>
+    <button class="settings-toggle" onclick="UI.openScreen('settings-screen')">⚙️</button>
+    <div class="container">
+        <div id="alertContainer"></div>
+        <main id="home-screen" class="screen active">
+            <section class="next-exam-card">
+                <h3 data-key="next_exam"></h3><p id="nextExamName">--</p><div id="countdown">00:00:00:00</div>
+            </section>
+            <section class="section" id="quick-notes-section">
+                <h2 data-key="quick_notes_title"></h2><div id="quickNotesList"></div>
+            </section>
+            <section class="section">
+                <h2 data-key="exams_schedule"></h2><div id="examList"><div class="loading-skeleton"></div></div>
+            </section>
+        </main>
+        <main id="add-lesson-screen" class="screen">
+            <section class="section">
+                <h2 data-key="add_subject_title"></h2>
+                <div class="form-group"><label for="year" data-key="form_year"></label><input id="year" data-key-placeholder="form_year_placeholder"></div>
+                <div class="form-group"><label for="subject" data-key="form_subject"></label><input id="subject" data-key-placeholder="form_subject_placeholder"></div>
+                <div class="form-group"><label for="examDate" data-key="form_exam_date"></label><input type="date" id="examDate"></div>
+                <button class="btn" onclick="SubjectManager.addSubject()"><span>➕</span> <span data-key="btn_add_subject"></span></button>
+            </section>
+            <section class="section">
+                <h2 data-key="add_lesson_title"></h2>
+                <div class="form-group"><label for="subjectList" data-key="form_select_subject"></label><select id="subjectList"></select></div>
+                <div class="form-group"><label for="lessonDesc" data-key="form_lesson_desc"></label><textarea id="lessonDesc" data-key-placeholder="form_lesson_desc_placeholder" rows="4"></textarea></div>
+                <div class="form-group">
+                    <label for="imageInput" data-key="form_images"></label>
+                    <input type="file" id="imageInput" accept="image/*" multiple style="display:none;">
+                    <button class="btn" onclick="document.getElementById('imageInput').click()"><span>🖼️</span> <span data-key="btn_select_images"></span></button>
+                    <button class="btn btn-gemini" onclick="SubjectManager.extractTextFromImages()" style="margin-top: 10px;">✨ <span data-key="gemini_extract_text"></span></button>
+                </div>
+                <div id="image-preview-container"></div>
+                <button class="btn btn-accent" onclick="SubjectManager.addLesson()"><span>💾</span> <span data-key="btn_save_lesson"></span></button>
+            </section>
+            <section class="section">
+                <h2 data-key="add_quick_note_title"></h2>
+                <div class="form-group"><label for="quickNoteInput" data-key="form_quick_note"></label><textarea id="quickNoteInput" data-key-placeholder="form_quick_note_placeholder"></textarea></div>
+                <button class="btn" onclick="NoteManager.addNote()"><span>📝</span> <span data-key="btn_add_note"></span></button>
+            </section>
+        </main>
+        <main id="review-screen" class="screen">
+            <h1 data-key="review_title"></h1>
+            <section class="section">
+                <div id="subject-filters" class="filters"></div><div id="reviewContent"><div class="loading-skeleton"></div></div>
+            </section>
+        </main>
+        <main id="gamify-screen" class="screen">
+            <h1 data-key="gamify_title"></h1>
+            <section class="section study-timer-container">
+                <h2 data-key="study_timer_title"></h2>
+                <div id="current-timer" class="timer-display">00:00:00</div>
+                <button id="study-timer-toggle" class="btn btn-accent"><span data-key="timer_start"></span></button>
+            </section>
+            <section class="section">
+                <h2 data-key="study_stats"></h2>
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-label" data-key="stat_today_time"></div><div class="stat-time" id="today-time">00:00:00</div></div>
+                    <div class="stat-card"><div class="stat-label" data-key="stat_session_time"></div><div class="stat-time" id="session-time">00:00:00</div></div>
+                </div>
+                <div class="daily-goal">
+                    <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;" data-key="daily_goal_text"></div>
+                    <div class="progress-bar"><div id="goal-progress" class="progress-fill" style="width: 0%"></div></div>
+                    <div id="goal-text">0%</div>
+                </div>
+            </section>
+            <section class="streak-card">
+                <div class="icon">🔥</div><div class="stat-label" data-key="stat_streak_days"></div><div class="stat-number" id="streak-days">0</div>
+            </section>
+        </main>
+        <main id="settings-screen" class="screen">
+            <h1 data-key="settings_title"></h1>
+            <section class="section">
+                <h2 data-key="settings_appearance"></h2>
+                <div class="setting-item" style="margin-bottom: 20px;">
+                    <div class="setting-item-label"><label for="darkModeToggle" style="margin:0;" data-key="dark_mode"></label><small data-key="dark_mode_reward_prompt"></small></div>
+                    <div class="toggle-switch-container"><input type="checkbox" id="darkModeToggle"><label for="darkModeToggle" class="slider"></label></div>
+                </div>
+                <div class="setting-item"><label style="margin:0;" data-key="language"></label><div class="toggle-switch-container"><input type="checkbox" id="languageToggle"><label for="languageToggle" class="slider"></label></div></div>
+            </section>
+            <section class="section">
+                <h2 data-key="settings_data_management"></h2><button class="btn btn-danger" onclick="UI.confirmClearAllData()"><span data-key="btn_clear_data"></span></button>
+            </section>
+        </main>
+    </div>
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active" data-screen="home-screen"><span class="icon">🏠</span><span class="label" data-key="nav_home"></span></a>
+        <a href="#" class="nav-item" data-screen="add-lesson-screen"><span class="icon">➕</span><span class="label" data-key="nav_add"></span></a>
+        <a href="#" class="nav-item" data-screen="review-screen"><span class="icon">📚</span><span class="label" data-key="nav_review"></span></a>
+        <a href="#" class="nav-item" data-screen="gamify-screen"><span class="icon">🔥</span><span class="label" data-key="nav_gamify"></span></a>
+    </nav>
+    <div id="lightbox" onclick="this.classList.remove('show')"><span class="close">×</span><img src="" id="lightbox-img" alt="Enlarged lesson image"></div>
+    <div id="edit-exam-modal" class="modal"><div class="modal-content" onclick="event.stopPropagation()"><h2 data-key="edit_exam_title"></h2><input type="hidden" id="edit-exam-id"><div class="form-group"><label for="edit-exam-date" data-key="form_exam_date"></label><input type="date" id="edit-exam-date"></div><div class="form-group" style="display: flex; align-items: center; gap: 10px;"><input type="checkbox" id="tbd-checkbox" style="width: auto;"><label for="tbd-checkbox" style="margin: 0;" data-key="exam_tbd"></label></div><div style="display:flex; gap: 15px; margin-top:20px;"><button class="btn btn-accent" onclick="SubjectManager.saveExamChanges()"><span data-key="btn_save_changes"></span></button><button class="btn" onclick="UI.closeModal('edit-exam-modal')"><span data-key="btn_cancel"></span></button></div></div></div>
+    <div id="confirm-delete-modal" class="modal"><div class="modal-content" onclick="event.stopPropagation()"><h2 data-key="confirm_delete_title"></h2><p id="confirm-delete-text"></p><div class="form-group"><input id="delete-confirmation-input" data-key-placeholder="confirm_delete_placeholder"></div><div style="display:flex; gap: 15px; margin-top:20px;"><button id="final-delete-btn" class="btn btn-danger" disabled><span data-key="btn_confirm_delete"></span></button><button class="btn" onclick="UI.closeModal('confirm-delete-modal')"><span data-key="btn_cancel"></span></button></div></div></div>
+    <div id="confirm-clear-all-modal" class="modal"><div class="modal-content" onclick="event.stopPropagation()"><h2 data-key="confirm_clear_all_title"></h2><p data-key="confirm_clear_all_text"></p><div class="form-group"><input id="clear-all-confirmation-input" data-key-placeholder="confirm_clear_all_placeholder"></div><div style="display:flex; gap: 15px; margin-top:20px;"><button id="final-clear-all-btn" class="btn btn-danger" disabled><span data-key="btn_confirm_clear_all"></span></button><button class="btn" onclick="UI.closeModal('confirm-clear-all-modal')"><span data-key="btn_cancel"></span></button></div></div></div>
+    <div id="gemini-modal" class="modal"><div class="modal-content" onclick="event.stopPropagation()"><h2 id="gemini-modal-title"></h2><div id="gemini-modal-body"></div><div style="display:flex; justify-content:flex-end; gap: 15px; margin-top:20px;"><button class="btn" onclick="UI.closeModal('gemini-modal')"><span data-key="btn_close"></span></button></div></div></div>
+    <div id="flashcard-modal" class="modal"><div class="modal-content" onclick="event.stopPropagation()"><h2 data-key="flashcards_title"></h2><div id="flashcard-modal-body"></div><div style="display:flex; justify-content:flex-end; gap: 15px; margin-top:20px;"><button class="btn" onclick="UI.closeModal('flashcard-modal')"><span data-key="btn_close"></span></button></div></div></div>
+    <div id="ad-modal" class="modal"><div class="modal-content" onclick="event.stopPropagation()"><h2 data-key="ad_modal_title"></h2><div id="ad-modal-body" style="text-align: center; padding: 20px 0;"><p id="ad-text" data-key="ad_watching_ad"></p><div id="ad-timer" style="font-size: 2rem; font-weight: bold; margin: 15px 0; color: var(--primary-color);">5</div></div><div style="display:flex; justify-content:flex-end; gap: 15px; margin-top:20px;"><button id="ad-close-button" class="btn" disabled><span data-key="btn_close"></span></button></div></div></div>
+
+    <script>
+    const TRANSLATIONS = {
+        ar: { nav_home: "الرئيسية", nav_add: "إضافة", nav_review: "مراجعة", nav_gamify: "حماسة", next_exam: "الامتحان القادم", exams_schedule: "جدول الامتحانات", add_subject_title: "إضافة مادة", add_lesson_title: "إضافة درس", form_year: "السنة الدراسية", form_subject: "اسم المادة", form_exam_date: "تاريخ الامتحان (اختياري)", form_year_placeholder: "مثال: 3 متوسط", form_subject_placeholder: "مثال: رياضيات", btn_add_subject: "إضافة المادة", form_select_subject: "اختر المادة", form_lesson_desc: "وصف الدرس (اختياري)", form_lesson_desc_placeholder: "أدخل وصفاً أو ملاحظات...", form_images: "صور الدرس", btn_select_images: "اختر الصور", btn_save_lesson: "حفظ الدرس", review_title: "مراجعة الدروس", gamify_title: "حماسة ومذاكرة", settings_title: "الإعدادات", settings_appearance: "المظهر", dark_mode: "الوضع الداكن", language: "English", dark_mode_reward_prompt: "(شاهد إعلانًا لمكافأة الوضع الليلي)", settings_data_management: "إدارة البيانات", btn_clear_data: "مسح جميع البيانات", edit_exam_title: "تعديل الامتحان", exam_tbd: "لم يحدد بعد", btn_save_changes: "حفظ", btn_cancel: "إلغاء", btn_close: "إغلاق", confirm_delete_title: "تأكيد الحذف", confirm_delete_text: 'لحذف المادة وكل دروسها، يرجى كتابة اسمها.', confirm_delete_placeholder: 'اكتب اسم المادة هنا', btn_confirm_delete: "تأكيد الحذف", confirm_clear_all_title: "تأكيد مسح كل البيانات", confirm_clear_all_text: "هذا الإجراء سيحذف كل شيء بشكل نهائي. للمتابعة، اكتب 'مسح الكل'.", confirm_clear_all_placeholder: "اكتب 'مسح الكل' للتأكيد", btn_confirm_clear_all: "نعم، امسح كل شيء", filter_all: "الكل", no_upcoming_exams: "لا توجد امتحانات قادمة", ended: "انتهى الوقت!", progress_label_text: (c, t) => `أنجزت ${c} من ${t} امتحان`, no_exams_defined: "لا توجد امتحانات محددة", no_lessons_to_show: "لا توجد دروس لعرضها.", no_subjects_to_add: "-- أضف مادة أولاً --", alert_error_fields: "يرجى ملء الحقول المطلوبة.", alert_error_lesson: "يجب إضافة صور للدرس.", alert_success_add_subject: "تمت إضافة المادة!", alert_success_add_lesson: "تم حفظ الدرس!", alert_changes_saved: "تم حفظ التغييرات", alert_data_cleared: "تم مسح جميع البيانات.", alert_subject_deleted: "تم حذف المادة.", study_timer_title: "عداد المذاكرة", study_stats: "إحصائياتك", timer_start: "▶️ ابدأ المذاكرة", timer_stop: "⏸️ أوقف المذاكرة", stat_today_time: "وقت مذاكرة اليوم", stat_session_time: "مدة الجلسة الحالية", daily_goal_text: "هدف اليوم: ساعتان", goal_completed_text: (p) => `${p}% مكتمل`, stat_streak_days: "أيام الحماسة المتتالية", alert_welcome: "أهلاً بك! اضغط زر البدء لبدء المذاكرة ⚡", alert_session_stopped: (m) => `رائع! أنهيت جلسة مذاكرة لمدة ${m} دقيقة 🎉`, alert_session_15min: 'ممتاز! أكملت 15 دقيقة 💪', alert_session_30min: 'رائع! نصف ساعة من التركز ⭐', alert_session_60min: 'إنجاز! ساعة كاملة من المذاكرة 🏆', alert_goal_50_percent: 'نصف الطريق! 🎯', alert_goal_100_percent: '🎉 مبروك! حققت هدفك اليومي! 🏅', alert_streak_3_days: 'حافظ على حماستك لـ 3 أيام متتالية! 🔥', alert_streak_7_days: 'أسبوع كامل من الالتزام! عمل مذهل! 🌟', quick_notes_title: "ملاحظات سريعة", add_quick_note_title: "إضافة ملاحظة سريعة", form_quick_note: "ملاحظتك", form_quick_note_placeholder: "اكتب شيئاً لتتذكره...", btn_add_note: "إضافة ملاحظة", alert_note_added: "تمت إضافة الملاحظة!", alert_note_deleted: "تم حذف الملاحظة.", no_quick_notes: "لا توجد ملاحظات سريعة بعد.", gemini_plan: "إنشاء خطة مذاكرة", gemini_explain: "اشرح المفهوم", gemini_quiz: "أنشئ اختبار", gemini_flashcards: "إنشاء بطاقات مراجعة", gemini_extract_text: "استخراج النص من الصور", gemini_plan_title: "خطة مذاكرة مقترحة", gemini_explain_title: "شرح مبسط", gemini_quiz_title: "اختبار قصير", flashcards_title: "بطاقات مراجعة", gemini_generating: "جاري الإنشاء بواسطة Gemini...", gemini_error: "حدث خطأ أثناء الاتصال بـ Gemini.", quiz_check_answer: "تحقق من الإجابة", quiz_correct: "إجابة صحيحة!", quiz_incorrect: (ans) => `خطأ. الإجابة الصحيحة: ${ans}`, alert_no_images_for_ocr: "يرجى اختيار صورة واحدة على الأقل لاستخراج النص منها.", alert_ocr_success: "تم استخراج النص بنجاح وإضافته للوصف!", alert_no_text_for_flashcards: "لا يوجد نص في وصف الدرس لإنشاء بطاقات منه.", ad_modal_title: "إعلان المكافأة", ad_watching_ad: "شاهد الإعلان للحصول على مكافأتك...", ad_reward_granted: "شكراً لمشاهدتك! لقد حصلت على المكافأة." },
+        en: { nav_home: "Home", nav_add: "Add", nav_review: "Review", nav_gamify: "Motivation", next_exam: "Next Exam", exams_schedule: "Exams Schedule", add_subject_title: "Add Subject", add_lesson_title: "Add Lesson", form_year: "School Year", form_subject: "Subject Name", form_exam_date: "Exam Date (Optional)", form_year_placeholder: "e.g., Grade 9", form_subject_placeholder: "e.g., Mathematics", btn_add_subject: "Add Subject", form_select_subject: "Select Subject", form_lesson_desc: "Lesson Description (Optional)", form_lesson_desc_placeholder: "Enter a description or notes...", form_images: "Lesson Images", btn_select_images: "Select Images", btn_save_lesson: "Save Lesson", review_title: "Review Lessons", gamify_title: "Motivation & Study", settings_title: "Settings", settings_appearance: "Appearance", dark_mode: "Dark Mode", language: "العربية", dark_mode_reward_prompt: "(Watch a rewarded ad for dark mode)", settings_data_management: "Data Management", btn_clear_data: "Clear All Data", edit_exam_title: "Edit Exam", exam_tbd: "To Be Determined", btn_save_changes: "Save", btn_cancel: "Cancel", btn_close: "Close", confirm_delete_title: "Confirm Deletion", confirm_delete_text: 'To delete the subject and all its lessons, please type its name.', confirm_delete_placeholder: 'Type the subject name here', btn_confirm_delete: "Confirm Delete", confirm_clear_all_title: "Confirm Clear All Data", confirm_clear_all_text: "This action will permanently delete everything. To proceed, type 'clear all'.", confirm_clear_all_placeholder: "Type 'clear all' to confirm", btn_confirm_clear_all: "Yes, clear everything", filter_all: "All", no_upcoming_exams: "No upcoming exams", ended: "Time's up!", progress_label_text: (c, t) => `Completed ${c} of ${t} exams`, no_exams_defined: "No exams defined", no_lessons_to_show: "No lessons to display.", no_subjects_to_add: "-- Add a subject first --", alert_error_fields: "Please fill the required fields.", alert_error_lesson: "Lesson images are required.", alert_success_add_subject: "Subject added!", alert_success_add_lesson: "Lesson saved!", alert_changes_saved: "Changes saved", alert_data_cleared: "All data has been cleared.", alert_subject_deleted: "Subject deleted.", study_timer_title: "Study Timer", study_stats: "Your Stats", timer_start: "▶️ Start Studying", timer_stop: "⏸️ Stop Studying", stat_today_time: "Today's Study Time", stat_session_time: "Current Session Time", daily_goal_text: "Daily Goal: 2 hours", goal_completed_text: (p) => `${p}% completed`, stat_streak_days: "Consecutive Study Streak", alert_welcome: "Welcome! Press the start button to begin studying ⚡", alert_session_stopped: (m) => `Great! You finished a ${m} minute study session 🎉`, alert_session_15min: 'Excellent! You completed 15 minutes 💪', alert_session_30min: 'Awesome! Half an hour of focus ⭐', alert_session_60min: 'Great achievement! A full hour of study 🏆', alert_goal_50_percent: 'Halfway there! 🎯', alert_goal_100_percent: '🎉 Congrats! You reached your daily goal! 🏅', alert_streak_3_days: 'Keep it up for 3 consecutive days! 🔥', alert_streak_7_days: 'A whole week of commitment! Amazing work! 🌟', quick_notes_title: "Quick Notes", add_quick_note_title: "Add a Quick Note", form_quick_note: "Your Note", form_quick_note_placeholder: "Write something to remember...", btn_add_note: "Add Note", alert_note_added: "Note added!", alert_note_deleted: "Note deleted.", no_quick_notes: "No quick notes yet.", gemini_plan: "Generate Study Plan", gemini_explain: "Explain Concept", gemini_quiz: "Create Quiz", gemini_flashcards: "Create Flashcards", gemini_extract_text: "Extract Text from Images", gemini_plan_title: "Suggested Study Plan", gemini_explain_title: "Simple Explanation", gemini_quiz_title: "Quick Quiz", flashcards_title: "Flashcards", gemini_generating: "Generating with Gemini...", gemini_error: "An error occurred while contacting Gemini.", quiz_check_answer: "Check Answer", quiz_correct: "Correct!", quiz_incorrect: (ans) => `Incorrect. The correct answer is: ${ans}`, alert_no_images_for_ocr: "Please select at least one image to extract text from.", alert_ocr_success: "Text successfully extracted and added to description!", alert_no_text_for_flashcards: "There is no text in the lesson description to create flashcards from.", ad_modal_title: "Rewarded Ad", ad_watching_ad: "Watch the ad to get your reward...", ad_reward_granted: "Thanks for watching! Reward granted." }
+    };
+    let currentLang = 'ar', db = null, selectedFiles = [];
+    const DB_CONFIG = { name: 'ZakerniAppDB_v8', version: 1, stores: { subjects: 'subjects', lessons: 'lessons', notes: 'notes' } };
+    const DB = {
+        init: () => new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
+            request.onerror = e => reject(e.target.error);
+            request.onsuccess = e => { db = e.target.result; resolve(db); };
+            request.onupgradeneeded = e => {
+                db = e.target.result;
+                Object.values(DB_CONFIG.stores).forEach(name => {
+                    if (!db.objectStoreNames.contains(name)) {
+                        const store = db.createObjectStore(name, { keyPath: 'id', autoIncrement: true });
+                        if (name === DB_CONFIG.stores.lessons) store.createIndex('subjectId', 'subjectId', { unique: false });
+                    }
+                });
+            };
+        }),
+        action: (storeName, mode, action) => new Promise((resolve, reject) => {
+            if (!db) return reject('DB not initialized');
+            const transaction = db.transaction(storeName, mode);
+            transaction.onerror = e => reject(e.target.error);
+            action(transaction.objectStore(storeName), resolve, reject);
+        }),
+        add: (store, data) => DB.action(store, 'readwrite', (s, res) => s.add(data).onsuccess = e => res(e.target.result)),
+        put: (store, data) => DB.action(store, 'readwrite', (s, res) => s.put(data).onsuccess = e => res(e.target.result)),
+        get: (store, id) => DB.action(store, 'readonly', (s, res) => s.get(id).onsuccess = e => res(e.target.result)),
+        getAll: (store) => DB.action(store, 'readonly', (s, res) => s.getAll().onsuccess = e => res(e.target.result)),
+        delete: (store, id) => DB.action(store, 'readwrite', (s, res) => s.delete(id).onsuccess = () => res())
+    };
+    const UI = {
+        elements: {},
+        init() { this.elements = { screens: document.querySelectorAll('.screen'), navItems: document.querySelectorAll('.nav-item'), alertContainer: document.getElementById('alertContainer') }; },
+        openScreen(screenId) { this.elements.screens.forEach(s => s.classList.remove('active')); document.getElementById(screenId).classList.add('active'); this.elements.navItems.forEach(i => i.classList.toggle('active', i.dataset.screen === screenId)); if (screenId === 'gamify-screen') GamifyApp.updateDisplay(); },
+        showAlert(key, type = 'success', args) { let message = TRANSLATIONS[currentLang][key] || key; if (typeof message === 'function') message = message(args); const alertDiv = document.createElement('div'); alertDiv.className = `alert ${type==='error'?'error':''}`; alertDiv.textContent = message; this.elements.alertContainer.prepend(alertDiv); setTimeout(() => { alertDiv.style.opacity = '0'; alertDiv.style.transform = 'translateY(20px) scale(0.9)'; setTimeout(() => alertDiv.remove(), 500); }, 4000); },
+        openModal: (modalId) => document.getElementById(modalId).classList.add('show'),
+        closeModal: (modalId) => document.getElementById(modalId).classList.remove('show'),
+        openImage: (src) => { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').classList.add('show'); },
+        confirmClearAllData() { const modalId = 'confirm-clear-all-modal', input = document.getElementById('clear-all-confirmation-input'), deleteBtn = document.getElementById('final-clear-all-btn'), confirmText = currentLang === 'ar' ? 'مسح الكل' : 'clear all'; input.value = ''; deleteBtn.disabled = true; input.oninput = () => { deleteBtn.disabled = input.value.toLowerCase() !== confirmText; }; deleteBtn.onclick = () => { indexedDB.deleteDatabase(DB_CONFIG.name); localStorage.clear(); UI.showAlert('alert_data_cleared'); UI.closeModal(modalId); setTimeout(() => window.location.reload(), 1500); }; this.openModal(modalId); },
+        showAdModal(rewardCallback) { const modalId = 'ad-modal', timerEl = document.getElementById('ad-timer'), closeBtn = document.getElementById('ad-close-button'), adText = document.getElementById('ad-text'); let countdown = 5; adText.textContent = TRANSLATIONS[currentLang].ad_watching_ad; timerEl.textContent = countdown; closeBtn.disabled = true; this.openModal(modalId); const interval = setInterval(() => { countdown--; timerEl.textContent = countdown; if (countdown <= 0) { clearInterval(interval); timerEl.textContent = '✅'; adText.textContent = TRANSLATIONS[currentLang].ad_reward_granted; closeBtn.disabled = false; closeBtn.onclick = () => { this.closeModal(modalId); rewardCallback(); }; } }, 1000); }
+    };
+    const Lang = {
+        set(lang) { currentLang = lang; const translations = TRANSLATIONS[lang]; document.documentElement.lang = lang; document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'; document.querySelectorAll('[data-key]').forEach(el => { const key = el.dataset.key; if (typeof translations[key] !== 'function' && translations[key]) el.textContent = translations[key]; }); document.querySelectorAll('[data-key-placeholder]').forEach(el => { if (translations[el.dataset.keyPlaceholder]) el.placeholder = translations[el.dataset.keyPlaceholder]; }); localStorage.setItem('language', lang); App.updateAllDynamicUI(); }
+    };
+    const NoteManager = {
+        async addNote() { const content = document.getElementById('quickNoteInput').value.trim(); if (!content) return UI.showAlert('alert_error_fields', 'error'); await DB.add(DB_CONFIG.stores.notes, { content, createdAt: new Date() }); UI.showAlert('alert_note_added'); document.getElementById('quickNoteInput').value = ''; App.renderQuickNotes(); },
+        async deleteNote(id) { await DB.delete(DB_CONFIG.stores.notes, id); UI.showAlert('alert_note_deleted'); App.renderQuickNotes(); }
+    };
+    const SubjectManager = {
+        async addSubject() { const year = document.getElementById("year").value.trim(), subject = document.getElementById("subject").value.trim(), date = document.getElementById("examDate").value; if (!year || !subject) return UI.showAlert('alert_error_fields', 'error'); await DB.add(DB_CONFIG.stores.subjects, { year, subject, date: date || null }); UI.showAlert('alert_success_add_subject'); document.getElementById("year").value = ''; document.getElementById("subject").value = ''; document.getElementById("examDate").value = ''; App.updateAllDynamicUI(); },
+        async addLesson() { const subjectId = parseInt(document.getElementById("subjectList").value), desc = document.getElementById("lessonDesc").value.trim(); if (!subjectId || selectedFiles.length === 0) return UI.showAlert('alert_error_lesson', 'error'); const imagePromises = selectedFiles.map(file => new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = e => resolve(e.target.result); reader.onerror = e => reject(e); reader.readAsDataURL(file); })); const imagesDataUrl = await Promise.all(imagePromises); await DB.add(DB_CONFIG.stores.lessons, { subjectId, desc, images: imagesDataUrl, createdAt: new Date() }); UI.showAlert('alert_success_add_lesson'); document.getElementById("lessonDesc").value = ''; document.getElementById("imageInput").value = ''; document.getElementById("image-preview-container").innerHTML = ''; selectedFiles = []; App.updateAllDynamicUI(); },
+        confirmDeleteSubject(id, name) { const modalId = 'confirm-delete-modal', textElement = document.querySelector('#confirm-delete-text'); textElement.innerHTML = `${TRANSLATIONS[currentLang].confirm_delete_text.replace('اسم المادة', `<strong>${name}</strong>`)}`; const input = document.getElementById('delete-confirmation-input'), deleteBtn = document.getElementById('final-delete-btn'); input.value = ''; deleteBtn.disabled = true; input.oninput = () => { deleteBtn.disabled = input.value !== name; }; deleteBtn.onclick = async () => { const lessons = await DB.getAll(DB_CONFIG.stores.lessons); const lessonsToDelete = lessons.filter(l => l.subjectId === id); for (const lesson of lessonsToDelete) await DB.delete(DB_CONFIG.stores.lessons, lesson.id); await DB.delete(DB_CONFIG.stores.subjects, id); UI.showAlert('alert_subject_deleted'); UI.closeModal(modalId); App.updateAllDynamicUI(); }; UI.openModal(modalId); },
+        async openEditModal(id) { const subject = await DB.get(DB_CONFIG.stores.subjects, id); document.getElementById('edit-exam-id').value = id; document.getElementById('edit-exam-date').value = subject.date; document.getElementById('tbd-checkbox').checked = !subject.date; document.getElementById('edit-exam-date').disabled = !subject.date; UI.openModal('edit-exam-modal'); },
+        async saveExamChanges() { const id = parseInt(document.getElementById('edit-exam-id').value), date = document.getElementById('edit-exam-date').value, isTBD = document.getElementById('tbd-checkbox').checked; const subject = await DB.get(DB_CONFIG.stores.subjects, id); subject.date = isTBD ? null : date; await DB.put(DB_CONFIG.stores.subjects, subject); UI.showAlert('alert_changes_saved'); UI.closeModal('edit-exam-modal'); App.updateAllDynamicUI(); },
+        handleImageSelection(event) { selectedFiles.push(...Array.from(event.target.files)); this.renderImagePreviews(); },
+        renderImagePreviews() { const previewContainer = document.getElementById('image-preview-container'); previewContainer.innerHTML = ''; selectedFiles.forEach((file, index) => { const reader = new FileReader(); reader.onload = e => { const wrapper = document.createElement('div'); wrapper.className = 'preview-image-wrapper'; const img = document.createElement('img'); img.src = e.target.result; const removeBtn = document.createElement('button'); removeBtn.className = 'remove-img-btn'; removeBtn.innerHTML = '×'; removeBtn.onclick = () => { selectedFiles.splice(index, 1); this.renderImagePreviews(); }; wrapper.appendChild(img); wrapper.appendChild(removeBtn); previewContainer.appendChild(wrapper); }; reader.readAsDataURL(file); }); },
+        async extractTextFromImages() { if (selectedFiles.length === 0) return UI.showAlert('alert_no_images_for_ocr', 'error'); const descTextarea = document.getElementById('lessonDesc'), button = document.querySelector('button[onclick="SubjectManager.extractTextFromImages()"]'), originalText = button.innerHTML; button.innerHTML = `<div class="loader" style="width:15px; height:15px; border-width:2px; margin:0;"></div>`; button.disabled = true; const imagePromises = selectedFiles.map(file => new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = e => resolve({ mimeType: file.type, data: e.target.result.split(',')[1] }); reader.onerror = reject; reader.readAsDataURL(file); })); const images = await Promise.all(imagePromises); const prompt = "استخرج النص من هذه الصور باللغة العربية."; const extractedText = await GeminiHelper.generateContent(prompt, false, images); if (extractedText) { descTextarea.value += (descTextarea.value ? '\n\n' : '') + extractedText; UI.showAlert('alert_ocr_success'); } button.innerHTML = originalText; button.disabled = false; }
+    };
+    const GeminiHelper = {
+        async generateContent(prompt, isJson = false, images = []) {
+            const modalBody = document.getElementById('gemini-modal-body');
+            if (!isJson) modalBody.innerHTML = `<div class="loader"></div><p style="text-align:center;">${TRANSLATIONS[currentLang].gemini_generating}</p>`;
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_API_KEY`;
+            const userParts = [{ text: prompt }];
+            if (images.length > 0) images.forEach(img => userParts.push({ inlineData: { mimeType: img.mimeType, data: img.data } }));
+            const payload = { contents: [{ role: "user", parts: userParts }] };
+            if (isJson) payload.generationConfig = { responseMimeType: "application/json", responseSchema: isJson === 'flashcards' ? { type: "ARRAY", items: { type: "OBJECT", properties: { question: { type: "STRING" }, answer: { type: "STRING" } }, required: ["question", "answer"] } } : { type: "ARRAY", items: { type: "OBJECT", properties: { question: { type: "STRING" }, options: { type: "ARRAY", items: { type: "STRING" } }, answer: { type: "STRING" } }, required: ["question", "options", "answer"] } } };
+            try { const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`); const result = await response.json(); if (result.candidates && result.candidates.length > 0) { const text = result.candidates[0].content.parts[0].text; return isJson ? JSON.parse(text) : text; } else { throw new Error("No content generated."); } } catch (error) { console.error("Gemini API Error:", error); if (!isJson) modalBody.innerHTML = `<p style="text-align:center; color: var(--danger-color);">${TRANSLATIONS[currentLang].gemini_error}</p>`; else UI.showAlert(TRANSLATIONS[currentLang].gemini_error, 'error'); return null; }
+        },
+        async generateStudyPlan(subjectName, days) { document.getElementById('gemini-modal-title').textContent = TRANSLATIONS[currentLang].gemini_plan_title; const prompt = `أنا طالب ولدي امتحان في مادة "${subjectName}" بعد ${days} يوم. أنشئ لي خطة مذاكرة يومية بسيطة وفعالة على شكل نقاط. اجعل الخطة باللغة العربية.`; const plan = await this.generateContent(prompt); if (plan) { document.getElementById('gemini-modal-body').innerHTML = `<div class="gemini-output">${plan}</div>`; UI.openModal('gemini-modal'); } },
+        async explainConcept(topic) { document.getElementById('gemini-modal-title').textContent = TRANSLATIONS[currentLang].gemini_explain_title; const prompt = `اشرح لي ببساطة وبشكل مباشر المفهوم التالي: "${topic}". استخدم لغة عربية واضحة ومثال إن أمكن.`; const explanation = await this.generateContent(prompt); if (explanation) { document.getElementById('gemini-modal-body').innerHTML = `<div class="gemini-output">${explanation}</div>`; UI.openModal('gemini-modal'); } },
+        async generateQuiz(topic) { document.getElementById('gemini-modal-title').textContent = TRANSLATIONS[currentLang].gemini_quiz_title; const prompt = `أنشئ اختبارًا قصيرًا من 3 أسئلة من نوع الاختيار من متعدد حول الموضوع التالي: "${topic}". يجب أن تكون الإجابات باللغة العربية.`; const quizData = await this.generateContent(prompt, 'quiz'); if (quizData) { this.renderQuiz(quizData); UI.openModal('gemini-modal'); } },
+        renderQuiz(quizData) { const modalBody = document.getElementById('gemini-modal-body'); let quizHtml = ''; quizData.forEach((q, index) => { const optionsHtml = q.options.map(opt => `<label class="quiz-option"><input type="radio" name="q${index}" value="${opt}">${opt}</label>`).join(''); quizHtml += `<div class="quiz-question" id="quiz-q${index}" style="margin-bottom: 20px;"><p><strong>${index + 1}. ${q.question}</strong></p>${optionsHtml}<button class="btn btn-sm btn-accent" style="margin-top:10px;" onclick="GeminiHelper.checkAnswer(${index}, '${q.answer.replace(/'/g, "\\'")}')">${TRANSLATIONS[currentLang].quiz_check_answer}</button><div class="quiz-result" id="result-q${index}"></div></div>`; }); modalBody.innerHTML = quizHtml; },
+        checkAnswer(qIndex, correctAnswer) { const resultDiv = document.getElementById(`result-q${qIndex}`), selectedOption = document.querySelector(`input[name="q${qIndex}"]:checked`); if (!selectedOption) return; if (selectedOption.value === correctAnswer) { resultDiv.textContent = TRANSLATIONS[currentLang].quiz_correct; resultDiv.className = 'quiz-result correct'; } else { resultDiv.textContent = TRANSLATIONS[currentLang].quiz_incorrect(correctAnswer); resultDiv.className = 'quiz-result incorrect'; } document.querySelectorAll(`input[name="q${qIndex}"]`).forEach(input => input.disabled = true); },
+        async generateFlashcards(lessonText) { if (!lessonText || lessonText.trim() === '') return UI.showAlert('alert_no_text_for_flashcards', 'error'); const modalBody = document.getElementById('flashcard-modal-body'); modalBody.innerHTML = `<div class="loader"></div><p style="text-align:center;">${TRANSLATIONS[currentLang].gemini_generating}</p>`; UI.openModal('flashcard-modal'); const prompt = `بناءً على النص التالي، قم بإنشاء 5 بطاقات مراجعة (سؤال وجواب) للمساعدة على المذاكرة. النص: "${lessonText}"`; const flashcardsData = await this.generateContent(prompt, 'flashcards'); if (flashcardsData && flashcardsData.length > 0) this.renderFlashcards(flashcardsData); else modalBody.innerHTML = `<p style="text-align:center; color: var(--danger-color);">${TRANSLATIONS[currentLang].gemini_error}</p>`; },
+        renderFlashcards(cards) { const modalBody = document.getElementById('flashcard-modal-body'); let currentIndex = 0; const updateCard = () => { const card = cards[currentIndex]; modalBody.innerHTML = `<div class="flashcard-container"><div class="flashcard" onclick="this.classList.toggle('is-flipped')"><div class="flashcard-face flashcard-front">${card.question}</div><div class="flashcard-face flashcard-back">${card.answer}</div></div></div><div class="flashcard-nav"><button id="prev-card" class="btn btn-sm">➡️</button><span class="flashcard-counter">${currentIndex + 1} / ${cards.length}</span><button id="next-card" class="btn btn-sm">⬅️</button></div>`; document.getElementById('prev-card').onclick = () => { currentIndex = (currentIndex - 1 + cards.length) % cards.length; updateCard(); }; document.getElementById('next-card').onclick = () => { currentIndex = (currentIndex + 1) % cards.length; updateCard(); }; }; updateCard(); }
+    };
+    const GamifyApp = {
+        state: { isStudying: false, currentSessionSeconds: 0, studyInterval: null }, DAILY_GOAL_SECONDS: 2 * 60 * 60, elements: {},
+        init() { this.bindElements(); this.bindEvents(); this.updateDisplay(); setTimeout(() => UI.showAlert('alert_welcome'), 1000); },
+        bindElements() { this.elements = { timerToggle: document.getElementById('study-timer-toggle'), currentTimer: document.getElementById('current-timer'), todayTime: document.getElementById('today-time'), sessionTime: document.getElementById('session-time'), streakDays: document.getElementById('streak-days'), goalProgress: document.getElementById('goal-progress'), goalText: document.getElementById('goal-text') }; },
+        bindEvents() { this.elements.timerToggle.addEventListener('click', () => this.toggleStudyTimer()); document.addEventListener('keydown', (e) => { if (document.getElementById('gamify-screen').classList.contains('active') && e.code === 'Space' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) { e.preventDefault(); this.toggleStudyTimer(); } }); },
+        toggleStudyTimer() { this.state.isStudying = !this.state.isStudying; this.state.isStudying ? this.startStudying() : this.stopStudying(); },
+        startStudying() { this.elements.timerToggle.innerHTML = `<span>${TRANSLATIONS[currentLang].timer_stop}</span>`; this.elements.timerToggle.classList.add('studying'); this.elements.currentTimer.classList.add('active'); this.state.currentSessionSeconds = 0; this.state.studyInterval = setInterval(() => { this.state.currentSessionSeconds++; let data = this.getStudyData(); data.todaySeconds++; this.saveStudyData(data); this.updateDisplay(); this.checkMilestones(data); }, 1000); },
+        stopStudying() { clearInterval(this.state.studyInterval); this.state.studyInterval = null; this.elements.timerToggle.innerHTML = `<span>${TRANSLATIONS[currentLang].timer_start}</span>`; this.elements.timerToggle.classList.remove('studying'); this.elements.currentTimer.classList.remove('active'); const sessionMinutes = Math.floor(this.state.currentSessionSeconds / 60); if (sessionMinutes > 0) UI.showAlert('alert_session_stopped', 'success', sessionMinutes); let data = this.getStudyData(); this.updateStreak(data); this.saveStudyData(data); this.state.currentSessionSeconds = 0; this.updateDisplay(); },
+        getStudyData() { const defaultData = { todaySeconds: 0, streak: 0, lastStudyDay: null, milestoneFlags: {} }; let data; try { data = JSON.parse(localStorage.getItem('gamifyData_v2')) || defaultData; } catch { data = defaultData; } const todayKey = new Date().toISOString().split('T')[0]; if (data.lastStudyDay !== todayKey) { data.todaySeconds = 0; data.milestoneFlags = {}; } return data; },
+        saveStudyData(data) { localStorage.setItem('gamifyData_v2', JSON.stringify(data)); },
+        updateStreak(data) { const today = new Date(), todayKey = today.toISOString().split('T')[0]; if(data.lastStudyDay === todayKey) return; const yesterday = new Date(); yesterday.setDate(today.getDate() - 1); const yesterdayKey = yesterday.toISOString().split('T')[0]; if (data.lastStudyDay === yesterdayKey) { data.streak = (data.streak || 0) + 1; if (data.streak === 3) UI.showAlert('alert_streak_3_days', 'success'); if (data.streak === 7) UI.showAlert('alert_streak_7_days', 'success'); } else { data.streak = 1; } data.lastStudyDay = todayKey; },
+        checkMilestones(data) { const sessionMins = Math.floor(this.state.currentSessionSeconds / 60); const checkAndAlert = (flag, condition, alertKey) => { if (condition && !data.milestoneFlags[flag]) { UI.showAlert(alertKey, 'success'); data.milestoneFlags[flag] = true; } }; checkAndAlert('s15', sessionMins === 15, 'alert_session_15min'); checkAndAlert('s30', sessionMins === 30, 'alert_session_30min'); checkAndAlert('s60', sessionMins === 60, 'alert_session_60min'); const progress = (data.todaySeconds / this.DAILY_GOAL_SECONDS) * 100; checkAndAlert('g50', progress >= 50, 'alert_goal_50_percent'); checkAndAlert('g100', progress >= 100, 'alert_goal_100_percent'); this.saveStudyData(data); },
+        updateDisplay() { const data = this.getStudyData(); const formatTime = (s) => { const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60; return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`; }; this.elements.currentTimer.textContent = formatTime(this.state.currentSessionSeconds); this.elements.todayTime.textContent = formatTime(data.todaySeconds || 0); this.elements.sessionTime.textContent = formatTime(this.state.currentSessionSeconds); this.elements.streakDays.textContent = data.streak || 0; const progressPercent = Math.min((data.todaySeconds / this.DAILY_GOAL_SECONDS) * 100, 100); this.elements.goalProgress.style.width = progressPercent + '%'; this.elements.goalText.textContent = TRANSLATIONS[currentLang].goal_completed_text(Math.round(progressPercent)); }
+    };
+    const App = {
+        countdownInterval: null,
+        async init() { UI.init(); await DB.init(); this.setupEventListeners(); const savedTheme = localStorage.getItem('theme') || 'light'; document.documentElement.setAttribute('data-theme', savedTheme); document.getElementById('darkModeToggle').checked = savedTheme === 'dark'; const savedLang = localStorage.getItem('language') || 'ar'; document.getElementById('languageToggle').checked = savedLang === 'en'; GamifyApp.init(); Lang.set(savedLang); },
+        setupEventListeners() { UI.elements.navItems.forEach(item => { item.addEventListener('click', (e) => { e.preventDefault(); UI.openScreen(item.dataset.screen); }); }); document.getElementById('darkModeToggle').addEventListener('change', (e) => { e.preventDefault(); const toggle = e.target; if (toggle.checked) { toggle.checked = false; UI.showAdModal(() => { const theme = 'dark'; document.documentElement.setAttribute('data-theme', theme); localStorage.setItem('theme', theme); toggle.checked = true; }); } else { const theme = 'light'; document.documentElement.setAttribute('data-theme', theme); localStorage.setItem('theme', theme); } }); document.getElementById('languageToggle').addEventListener('change', (e) => Lang.set(e.target.checked ? 'en' : 'ar')); document.getElementById('imageInput').addEventListener('change', (event) => SubjectManager.handleImageSelection(event)); document.getElementById('tbd-checkbox').addEventListener('change', (e) => { document.getElementById('edit-exam-date').disabled = e.target.checked; }); },
+        async updateAllDynamicUI() { const subjects = await DB.getAll(DB_CONFIG.stores.subjects); this.renderSubjectDropdown(subjects); this.renderExams(subjects); this.updateNextExamCountdown(subjects); this.renderSubjectFilters(subjects); this.showAllLessons(); this.renderQuickNotes(); GamifyApp.updateDisplay(); },
+        renderSubjectDropdown(subjects) { const subjectList = document.getElementById("subjectList"); if (subjects.length > 0) subjectList.innerHTML = `<option value="">-- ${TRANSLATIONS[currentLang].form_select_subject} --</option>${subjects.map(s => `<option value="${s.id}">${s.subject} (${s.year})</option>`).join("")}`; else subjectList.innerHTML = `<option value="">${TRANSLATIONS[currentLang].no_subjects_to_add}</option>`; },
+        async renderQuickNotes() { const container = document.getElementById('quickNotesList'), notes = await DB.getAll(DB_CONFIG.stores.notes); if(notes.length === 0) { container.innerHTML = `<div class="empty-state">${TRANSLATIONS[currentLang].no_quick_notes}</div>`; return; } container.innerHTML = notes.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(note => `<div class="quick-note-item"><p>${note.content}</p><button class="btn btn-danger btn-sm" onclick="NoteManager.deleteNote(${note.id})">🗑️</button></div>`).join(''); },
+        renderExams(subjects) { const list = document.getElementById("examList"); if (!subjects || subjects.length === 0) { list.innerHTML = `<div class="empty-state">${TRANSLATIONS[currentLang].no_exams_defined}</div>`; return; } const sorted = subjects.sort((a, b) => (a.date ? new Date(a.date) : Infinity) - (b.date ? new Date(b.date) : Infinity)); list.innerHTML = sorted.map(s => { const daysRemaining = s.date ? Math.ceil((new Date(s.date) - new Date()) / 86400000) : null; const isUrgent = daysRemaining !== null && daysRemaining <= 7; let statusClass = s.date ? (isUrgent ? 'urgent' : '') : 'tbd'; let dateText = s.date ? new Date(s.date).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US', { day: '2-digit', month: 'short', year: 'numeric' }) : TRANSLATIONS[currentLang].exam_tbd; const geminiButton = s.date && daysRemaining > 0 ? `<button class="btn btn-gemini btn-sm" onclick="GeminiHelper.generateStudyPlan('${s.subject}', ${daysRemaining})">✨ <span data-key="gemini_plan"></span></button>` : ''; return `<div class="exam-item ${statusClass}"><div class="exam-info"><h3>${s.subject} (${s.year})</h3><p>${dateText}</p></div><div class="exam-item-buttons">${geminiButton}<button class="btn btn-sm" onclick="SubjectManager.openEditModal(${s.id})">✏️</button><button class="btn btn-danger btn-sm" onclick="SubjectManager.confirmDeleteSubject(${s.id}, '${s.subject}')">🗑️</button></div></div>`; }).join(""); Lang.set(currentLang); },
+        updateNextExamCountdown(subjects) { if (this.countdownInterval) clearInterval(this.countdownInterval); const upcomingExams = subjects.filter(s => s.date && new Date(s.date) > new Date()).sort((a, b) => new Date(a.date) - new Date(b.date)); const nextExamNameEl = document.getElementById('nextExamName'), countdownEl = document.getElementById('countdown'); if (upcomingExams.length === 0) { nextExamNameEl.textContent = TRANSLATIONS[currentLang].no_upcoming_exams; countdownEl.textContent = "🎉"; return; } const nextExam = upcomingExams[0]; nextExamNameEl.textContent = `${nextExam.subject} (${nextExam.year})`; const update = () => { const distance = new Date(nextExam.date).getTime() - new Date().getTime(); if (distance < 0) { countdownEl.textContent = TRANSLATIONS[currentLang].ended; clearInterval(this.countdownInterval); return; } const d = Math.floor(distance / 86400000), h = Math.floor((distance % 86400000) / 3600000), m = Math.floor((distance % 3600000) / 60000), s = Math.floor((distance % 60000) / 1000); countdownEl.textContent = `${d.toString().padStart(2,'0')}:${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; }; this.countdownInterval = setInterval(update, 1000); update(); },
+        renderSubjectFilters(subjects) { const container = document.getElementById('subject-filters'); container.innerHTML = `<button class="filter-btn active" onclick="App.filterLessonsBySubject('all')">${TRANSLATIONS[currentLang].filter_all}</button>` + subjects.map(s => `<button class="filter-btn" onclick="App.filterLessonsBySubject(${s.id})">${s.subject}</button>`).join(''); },
+        filterLessonsBySubject(subjectId) { document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active')); const activeBtn = document.querySelector(`.filter-btn[onclick="App.filterLessonsBySubject('${subjectId}')"]`); if (activeBtn) activeBtn.classList.add('active'); this.showAllLessons(subjectId); },
+        async showAllLessons(subjectId = 'all') { const container = document.getElementById('reviewContent'); container.innerHTML = '<div class="loading-skeleton"></div>'; const lessons = await DB.getAll(DB_CONFIG.stores.lessons); const subjects = await DB.getAll(DB_CONFIG.stores.subjects); const subjectsMap = new Map(subjects.map(s => [s.id, s])); const filteredLessons = subjectId === 'all' ? lessons : lessons.filter(l => l.subjectId === subjectId); if (filteredLessons.length === 0) { container.innerHTML = `<div class="empty-state">${TRANSLATIONS[currentLang].no_lessons_to_show}</div>`; return; } container.innerHTML = filteredLessons.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(lesson => { const subject = subjectsMap.get(lesson.subjectId); const topic = lesson.desc || (subject ? subject.subject : 'this topic'); const safeTopic = topic.replace(/'/g, "\\'").replace(/"/g, "&quot;"); return `<div class="lesson-card" style="margin-bottom:20px;"><h3>${subject ? `${subject.subject} (${subject.year})` : ''}</h3>${lesson.desc ? `<p>${lesson.desc}</p>` : ''}<div class="lesson-images">${lesson.images.map(img => `<img src="${img}" onclick="UI.openImage(this.src)" alt="Lesson image">`).join('')}</div><div class="lesson-card-actions"><button class="btn btn-gemini btn-sm" onclick="GeminiHelper.explainConcept('${safeTopic}')">✨ <span data-key="gemini_explain"></span></button><button class="btn btn-gemini btn-sm" onclick="GeminiHelper.generateQuiz('${safeTopic}')">🧠 <span data-key="gemini_quiz"></span></button><button class="btn btn-gemini btn-sm" onclick="GeminiHelper.generateFlashcards('${safeTopic}')">🃏 <span data-key="gemini_flashcards"></span></button></div></div>`; }).join(''); Lang.set(currentLang); }
+    };
+    document.addEventListener('DOMContentLoaded', () => App.init());
+    </script>
+</body>
+</html>
