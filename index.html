@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ذاكرني - الصفحة الرئيسية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* الألوان والثيم */
+        :root { --primary-color: #6a66f1; --secondary-color: #8b5cf6; --accent-color: #10b981; --danger-color: #ef4444; --warning-color: #f59e0b; --info-color: #3b82f6; --gemini-color: #8e44ad; --bg-main: #f3f4f6; --bg-section: #ffffff; --bg-alt: #e5e7eb; --text-primary: #1f2937; --text-secondary: #4b5563; --text-muted: #6b7280; --border-color: #d1d5db; --shadow-color: rgba(106, 102, 241, 0.1); --primary-shadow-color: rgba(106, 102, 241, 0.2); --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); --gradient-accent: linear-gradient(135deg, var(--accent-color) 0%, #14b8a6 100%); --gradient-danger: linear-gradient(135deg, var(--danger-color) 0%, #f76a6a 100%); --gradient-warning: linear-gradient(135deg, var(--warning-color) 0%, #f59e0b 100%); --gradient-gemini: linear-gradient(135deg, var(--gemini-color) 0%, #9b59b6 100%); --radius-md: 16px; --radius-lg: 24px; --transition: 0.3s ease; }
+        [data-theme="dark"] { --primary-color: #818cf8; --secondary-color: #a78bfa; --accent-color: #34d399; --danger-color: #f87171; --gemini-color: #a569bd; --bg-main: #111827; --bg-section: #1f2937; --bg-alt: #374151; --text-primary: #f9fafb; --text-secondary: #d1d5db; --text-muted: #9ca3af; --border-color: #4b5563; --shadow-color: rgba(0, 0, 0, 0.25); --primary-shadow-color: rgba(129, 140, 248, 0.25); }
+        /* الأساسيات */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-main); color: var(--text-primary); min-height: 100vh; line-height: 1.7; padding-bottom: 90px; transition: background-color var(--transition), color var(--transition); }
+        .container { max-width: 700px; margin: 0 auto; padding: 15px; } /* تضييق الحاوية */
+        .screen { display: block; animation: fadeIn 0.5s ease-out; }
+        h1, h2 { text-align: center; margin-bottom: 25px; font-weight: 800; }
+        h1 { font-size: 2rem; color: var(--primary-color); }
+        h2 { font-size: 1.5rem; color: var(--text-primary); position: relative; }
+        
+        /* الأقسام (البطاقات) */
+        .section { background: var(--bg-section); margin-bottom: 20px; padding: 20px; border-radius: var(--radius-lg); box-shadow: 0 5px 15px var(--shadow-color); }
+
+        /* الأزرار */
+        .btn { background: var(--gradient-primary); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 700; cursor: pointer; transition: all var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px var(--primary-shadow-color); }
+        .btn-accent { background: var(--gradient-accent); }
+        .btn-danger { background: var(--gradient-danger); }
+        .btn-sm { padding: 8px 12px; font-size: 0.9rem; border-radius: 12px;}
+
+        /* بطاقة الامتحان القادم والعد التنازلي */
+        .next-exam-card { background: var(--gradient-primary); color: white; padding: 25px; border-radius: var(--radius-lg); text-align: center; margin-bottom: 25px; box-shadow: 0 10px 20px var(--primary-shadow-color); }
+        .next-exam-card h3 { font-size: 1.2rem; margin-bottom: 5px; opacity: 0.8; }
+        #nextExamName { font-size: 1.5rem; font-weight: 800; margin-bottom: 15px; }
+        #countdown-wrapper { display: flex; justify-content: center; gap: 10px; }
+        .countdown-segment { display: flex; flex-direction: column; align-items: center; font-size: 1.1rem; font-weight: 700; }
+        .countdown-segment .value { font-size: 2rem; line-height: 1; }
+        .countdown-segment .label { font-size: 0.7rem; opacity: 0.8; margin-top: 5px; }
+
+        /* قائمة الملاحظات السريعة */
+        #quick-notes-section { border-inline-start: 6px solid var(--warning-color); }
+        .quick-note-item { display: flex; justify-content: space-between; align-items: center; gap: 10px; background-color: var(--bg-alt); padding: 15px; border-radius: var(--radius-md); margin-bottom: 10px; border-inline-start: 4px solid var(--warning-color); transition: all var(--transition); }
+        .quick-note-item:hover { background-color: color-mix(in srgb, var(--bg-alt) 80%, var(--bg-section)); }
+        .quick-note-item p { margin: 0; flex-grow: 1; font-size: 0.95rem; }
+        .quick-note-item .note-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 5px; display: block; }
+        .quick-note-item .note-actions { display: flex; gap: 5px; }
+
+        /* جدول الامتحانات */
+        #examList { display: grid; gap: 15px; }
+        .exam-item { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px; background: var(--bg-section); padding: 20px; border-radius: var(--radius-md); border-inline-start: 6px solid var(--info-color); transition: all var(--transition); box-shadow: 0 2px 10px var(--shadow-color); }
+        .exam-item:hover { transform: translateY(-2px); box-shadow: 0 4px 15px var(--primary-shadow-color); }
+        .exam-item.urgent { border-inline-start-color: var(--danger-color); }
+        .exam-item.tbd { border-inline-start-color: var(--text-muted); }
+        .exam-info h3 { margin: 0 0 5px 0; font-size: 1.1rem; text-align: right; }
+        .exam-info p { margin: 0; font-size: 0.9rem; color: var(--text-secondary); }
+        .exam-item-buttons { display:flex; gap:10px; }
+
+        /* النموذج والمدخلات في المودال */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-size: 1rem; font-family: 'Cairo', sans-serif; background: var(--bg-alt); color: var(--text-primary); transition: all var(--transition); }
+        input:focus, textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-shadow-color); }
+        
+        /* حقول التاريخ والوقت في المودال */
+        .date-time-group { display: flex; gap: 15px; }
+        .date-time-group > div { flex: 1; }
+        
+        /* التنقل السفلي والمودال */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: color-mix(in srgb, var(--bg-section) 90%, transparent); backdrop-filter: blur(10px); box-shadow: 0 -5px 20px var(--shadow-color); display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; border-top: 1px solid var(--border-color); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); text-decoration: none; padding: 5px 15px; border-radius: var(--radius-md); transition: all var(--transition); cursor: pointer; flex-grow: 1; }
+        .nav-item .icon { font-size: 1.6rem; margin-bottom: 3px; }
+        .nav-item .label { font-size: 0.8rem; font-weight: 600; }
+        .nav-item.active { color: var(--primary-color); transform: translateY(-2px); }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1500; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-content { background: var(--bg-section); padding: 30px; border-radius: var(--radius-lg); width: 100%; max-width: 450px; animation: slideUpModal 0.4s ease-out; max-height: 90vh; overflow-y: auto; }
+        .modal-content h2 { margin-top: 0; font-size: 1.4rem; }
+        .empty-state { text-align: center; padding: 30px; color: var(--text-muted); font-size: 1rem; }
+        .loading-skeleton { background-color: var(--bg-alt); border-radius: var(--radius-md); min-height: 100px; animation: pulse 1.5s infinite; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUpModal { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <main id="home-screen" class="screen active">
+            
+            <section class="next-exam-card">
+                <i class="fas fa-calendar-check" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                <h3>الامتحان القادم هو:</h3>
+                <p id="nextExamName">--</p>
+                <div id="countdown-wrapper">
+                    <div class="countdown-segment"><span id="days" class="value">00</span><span class="label">أيام</span></div>
+                    <div class="countdown-segment"><span id="hours" class="value">00</span><span class="label">ساعات</span></div>
+                    <div class="countdown-segment"><span id="minutes" class="value">00</span><span class="label">دقائق</span></div>
+                    <div class="countdown-segment"><span id="seconds" class="value">00</span><span class="label">ثواني</span></div>
+                </div>
+            </section>
+            
+            <section class="section" id="quick-notes-section">
+                <h2><i class="fas fa-sticky-note"></i> ملاحظات سريعة</h2>
+                <div id="quickNotesList">
+                    <div class="loading-skeleton" style="min-height: 50px;"></div>
+                </div>
+            </section>
+            
+            <section class="section">
+                <h2><i class="fas fa-calendar-alt"></i> جدول الامتحانات</h2>
+                <div id="examList">
+                    <div class="loading-skeleton"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <span class="icon"><i class="fas fa-home"></i></span>
+            <span class="label">الرئيسية</span>
+        </a>
+        <a href="add.html" class="nav-item">
+            <span class="icon"><i class="fas fa-plus-circle"></i></span>
+            <span class="label">إضافة</span>
+        </a>
+        <a href="review.html" class="nav-item">
+            <span class="icon"><i class="fas fa-book-open"></i></span>
+            <span class="label">مراجعة</span>
+        </a>
+    </nav>
+
+    <div id="edit-exam-modal" class="modal" onclick="UI.closeModal('edit-exam-modal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2>تعديل تاريخ الامتحان</h2>
+            <input type="hidden" id="edit-exam-id">
+            <div class="form-group">
+                <label for="edit-exam-subject-name">المادة:</label>
+                <input type="text" id="edit-exam-subject-name" disabled style="background: var(--bg-main); opacity: 0.7;">
+            </div>
+            <div class="form-group">
+                <label for="edit-exam-date"><i class="fas fa-calendar-day"></i> تاريخ الامتحان الجديد</label>
+                <input type="date" id="edit-exam-date">
+            </div>
+            <div style="display:flex; justify-content: space-between; gap: 15px; margin-top:20px;">
+                <button class="btn btn-accent" onclick="saveExamChanges()"><span><i class="fas fa-save"></i> حفظ التغييرات</span></button>
+                <button class="btn" style="background: var(--bg-alt); color: var(--text-primary);" onclick="UI.closeModal('edit-exam-modal')"><span>إلغاء</span></button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="edit-note-modal" class="modal" onclick="UI.closeModal('edit-note-modal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2>تعديل الملاحظة السريعة</h2>
+            <input type="hidden" id="edit-note-id">
+            <div class="form-group">
+                <label for="edit-note-content"><i class="fas fa-pencil-alt"></i> نص الملاحظة</label>
+                <textarea id="edit-note-content" rows="4"></textarea>
+            </div>
+            <div class="date-time-group">
+                <div class="form-group">
+                    <label for="edit-note-date"><i class="fas fa-calendar-day"></i> تاريخ التذكير (اختياري)</label>
+                    <input type="date" id="edit-note-date">
+                </div>
+                <div class="form-group">
+                    <label for="edit-note-time"><i class="fas fa-clock"></i> وقت التذكير (اختياري)</label>
+                    <input type="time" id="edit-note-time">
+                </div>
+            </div>
+            <div style="display:flex; justify-content: space-between; gap: 15px; margin-top:20px;">
+                <button class="btn btn-accent" onclick="saveNoteChanges()"><span><i class="fas fa-save"></i> حفظ التعديل</span></button>
+                <button class="btn" style="background: var(--bg-alt); color: var(--text-primary);" onclick="UI.closeModal('edit-note-modal')"><span>إلغاء</span></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // هنا يتم تضمين جميع أكواد JS المطلوبة لهذه الصفحة
+        let db = null;
+        const DB_CONFIG = { name: 'ZakerniAppDB_v9', version: 1, stores: { subjects: 'subjects', lessons: 'lessons', notes: 'notes' } };
+
+        const DB = {
+            init: () => new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
+                request.onerror = e => reject(e.target.error);
+                request.onsuccess = e => { db = e.target.result; resolve(db); };
+                request.onupgradeneeded = e => {
+                    db = e.target.result;
+                    Object.values(DB_CONFIG.stores).forEach(name => {
+                        if (!db.objectStoreNames.contains(name)) {
+                            const store = db.createObjectStore(name, { keyPath: 'id', autoIncrement: true });
+                            if (name === DB_CONFIG.stores.lessons) store.createIndex('subjectId', 'subjectId', { unique: false });
+                        }
+                    });
+                };
+            }),
+            action: (storeName, mode, action) => new Promise((resolve, reject) => {
+                if (!db) return reject('DB not initialized');
+                const transaction = db.transaction(storeName, mode);
+                transaction.onerror = e => reject(e.target.error);
+                const store = transaction.objectStore(storeName);
+                action(store, resolve, reject);
+            }),
+            getAll: (store) => DB.action(store, 'readonly', (s, res) => s.getAll().onsuccess = e => res(e.target.result)),
+            get: (store, id) => DB.action(store, 'readonly', (s, res) => s.get(id).onsuccess = e => res(e.target.result)),
+            put: (store, data) => DB.action(store, 'readwrite', (s, res) => s.put(data).onsuccess = e => res(e.target.result)),
+            delete: (store, id) => DB.action(store, 'readwrite', (s, res) => s.delete(id).onsuccess = () => res()),
+        };
+
+        const UI = {
+            openModal: (modalId) => document.getElementById(modalId)?.classList.add('show'),
+            closeModal: (modalId) => document.getElementById(modalId)?.classList.remove('show'),
+        };
+
+        async function initHomePage() {
+            // إظهار الهياكل العظمية أثناء التحميل
+            document.getElementById('quickNotesList').innerHTML = '<div class="loading-skeleton" style="min-height: 50px;"></div><div class="loading-skeleton" style="min-height: 50px; width: 80%; margin-top: 10px;"></div>';
+            document.getElementById('examList').innerHTML = '<div class="loading-skeleton"></div>';
+            
+            await DB.init();
+            renderQuickNotes();
+            renderExams();
+            updateNextExamCountdown();
+        }
+
+        async function renderQuickNotes() {
+            const container = document.getElementById('quickNotesList');
+            container.innerHTML = '';
+            const notes = await DB.getAll(DB_CONFIG.stores.notes);
+            
+            if (notes.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-info-circle"></i> لا توجد ملاحظات سريعة بعد. أضف ملاحظة من شاشة الإضافة.</div>`;
+                return;
+            }
+            
+            notes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(note => {
+                const div = document.createElement('div');
+                div.className = 'quick-note-item';
+                
+                const p = document.createElement('p');
+                p.innerHTML = note.content;
+                
+                // عرض التاريخ والوقت الاختياريين
+                if (note.reminderDate || note.reminderTime) {
+                    let metaText = '';
+                    if (note.reminderDate) {
+                         const dateStr = new Date(note.reminderDate).toLocaleDateString('ar-EG', { day: '2-digit', month: 'short', year: 'numeric' });
+                         metaText += `<i class="fas fa-bell"></i> ${dateStr}`;
+                    }
+                    if (note.reminderTime) {
+                         metaText += (metaText ? ' في ' : '<i class="fas fa-bell"></i> ') + note.reminderTime;
+                    }
+                    const metaSpan = document.createElement('span');
+                    metaSpan.className = 'note-meta';
+                    metaSpan.innerHTML = metaText;
+                    p.appendChild(metaSpan);
+                }
+
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'note-actions';
+
+                // زر التعديل الجديد
+                const editButton = document.createElement('button');
+                editButton.className = 'btn btn-sm';
+                editButton.style.backgroundColor = 'var(--info-color)'; // لون أزرق للتعديل
+                editButton.innerHTML = '<i class="fas fa-pen"></i>';
+                editButton.title = 'تعديل الملاحظة';
+                editButton.onclick = () => openEditNoteModal(note.id); // دالة فتح مودال تعديل الملاحظة
+                actionsDiv.appendChild(editButton);
+
+                // زر الحذف
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'btn btn-danger btn-sm';
+                deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteButton.title = 'حذف الملاحظة';
+                deleteButton.onclick = async () => { 
+                    if (confirm('هل أنت متأكد من حذف هذه الملاحظة؟')) {
+                        await DB.delete(DB_CONFIG.stores.notes, note.id); 
+                        renderQuickNotes(); 
+                    }
+                };
+                
+                actionsDiv.appendChild(deleteButton);
+                
+                div.appendChild(p);
+                div.appendChild(actionsDiv);
+                container.appendChild(div);
+            });
+        }
+        
+        // **********************************************
+        // دوال تعديل الملاحظات السريعة الجديدة
+        // **********************************************
+        
+        async function openEditNoteModal(id) {
+            const note = await DB.get(DB_CONFIG.stores.notes, id);
+            
+            document.getElementById('edit-note-id').value = id;
+            document.getElementById('edit-note-content').value = note.content;
+            document.getElementById('edit-note-date').value = note.reminderDate || '';
+            document.getElementById('edit-note-time').value = note.reminderTime || '';
+            
+            UI.openModal('edit-note-modal');
+        }
+
+        async function saveNoteChanges() {
+            const id = parseInt(document.getElementById('edit-note-id').value);
+            const content = document.getElementById('edit-note-content').value.trim();
+            const date = document.getElementById('edit-note-date').value;
+            const time = document.getElementById('edit-note-time').value;
+
+            if (!content) {
+                alert('لا يمكن حفظ ملاحظة فارغة.');
+                return;
+            }
+
+            const note = await DB.get(DB_CONFIG.stores.notes, id);
+            
+            // تحديث البيانات
+            note.content = content;
+            note.reminderDate = date || null;
+            note.reminderTime = time || null;
+
+            await DB.put(DB_CONFIG.stores.notes, note);
+            UI.closeModal('edit-note-modal');
+            renderQuickNotes(); // إعادة عرض الملاحظات المحدثة
+        }
+        
+        // **********************************************
+        // الدوال الأخرى (تم إبقاؤها كما هي)
+        // **********************************************
+
+        async function renderExams() {
+            const list = document.getElementById("examList");
+            list.innerHTML = '';
+            const subjects = await DB.getAll(DB_CONFIG.stores.subjects);
+            
+            if (!subjects || subjects.length === 0) {
+                list.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i> لا توجد مواد أو امتحانات محددة بعد.</div>`;
+                return;
+            }
+            
+            subjects.sort((a, b) => (a.date ? new Date(a.date) : Infinity) - (b.date ? new Date(b.date) : Infinity)).forEach(s => {
+                const examDate = s.date ? new Date(s.date) : null;
+                const daysRemaining = examDate ? Math.ceil((examDate.getTime() - new Date().getTime()) / 86400000) : null;
+                const isUrgent = daysRemaining !== null && daysRemaining <= 7 && daysRemaining >= 0;
+                const isPassed = daysRemaining !== null && daysRemaining < 0;
+                
+                let statusClass = s.date ? (isUrgent ? 'urgent' : (isPassed ? 'tbd' : '')) : 'tbd'; 
+                if (isPassed) statusClass = 'passed'; 
+
+                const dateText = s.date 
+                    ? (isPassed ? 'انتهى' : new Date(s.date).toLocaleDateString('ar-EG', { day: '2-digit', month: 'short', year: 'numeric' })) 
+                    : 'لم يحدد بعد';
+                
+                const item = document.createElement('div');
+                item.className = `exam-item ${statusClass}`;
+                
+                item.innerHTML = `
+                    <div class="exam-info">
+                        <h3>${s.subject} <span style="font-weight: normal; color: var(--text-muted);">(${s.year})</span></h3>
+                        <p>${dateText}</p>
+                    </div>`;
+                
+                const buttonsWrapper = document.createElement('div');
+                buttonsWrapper.className = 'exam-item-buttons';
+                
+                // زر التعديل (يظهر فقط إذا لم يكن قد انتهى)
+                if (!isPassed) {
+                    const editButton = document.createElement('button');
+                    editButton.className = 'btn btn-sm';
+                    editButton.innerHTML = '<i class="fas fa-edit"></i>';
+                    editButton.title = 'تعديل التاريخ';
+                    editButton.onclick = () => openEditModal(s.id);
+                    buttonsWrapper.appendChild(editButton);
+                }
+                
+                // زر الحذف
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'btn btn-danger btn-sm';
+                deleteButton.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteButton.title = 'حذف المادة والامتحان';
+                deleteButton.onclick = async () => { 
+                    if (confirm(`هل أنت متأكد من حذف مادة ${s.subject}؟ سيتم حذف جميع الدروس المتعلقة بها.`)) {
+                        await DB.delete(DB_CONFIG.stores.subjects, s.id); 
+                        renderExams(); 
+                        updateNextExamCountdown(); 
+                    }
+                };
+                
+                buttonsWrapper.appendChild(deleteButton);
+                item.appendChild(buttonsWrapper);
+                list.appendChild(item);
+            });
+        }
+
+        async function openEditModal(id) {
+            const subject = await DB.get(DB_CONFIG.stores.subjects, id);
+            document.getElementById('edit-exam-id').value = id;
+            document.getElementById('edit-exam-date').value = subject.date;
+            document.getElementById('edit-exam-subject-name').value = `${subject.subject} (${subject.year})`;
+            UI.openModal('edit-exam-modal');
+        }
+
+        async function saveExamChanges() {
+            const id = parseInt(document.getElementById('edit-exam-id').value);
+            const date = document.getElementById('edit-exam-date').value;
+            
+            if (!date) {
+                alert('الرجاء تحديد تاريخ للامتحان.');
+                return;
+            }
+
+            const subject = await DB.get(DB_CONFIG.stores.subjects, id);
+            subject.date = date;
+            await DB.put(DB_CONFIG.stores.subjects, subject);
+            UI.closeModal('edit-exam-modal');
+            renderExams();
+            updateNextExamCountdown();
+        }
+
+        let countdownInterval = null;
+        async function updateNextExamCountdown() {
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            const nextExamNameEl = document.getElementById('nextExamName');
+            const daysEl = document.getElementById('days');
+            const hoursEl = document.getElementById('hours');
+            const minutesEl = document.getElementById('minutes');
+            const secondsEl = document.getElementById('seconds');
+            
+            const subjects = await DB.getAll(DB_CONFIG.stores.subjects);
+            const upcomingExams = subjects
+                .filter(s => s.date && new Date(s.date).getTime() >= new Date().getTime() - 86400000)
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+                
+            if (upcomingExams.length === 0) {
+                nextExamNameEl.textContent = 'لا توجد امتحانات قادمة';
+                daysEl.textContent = hoursEl.textContent = minutesEl.textContent = secondsEl.textContent = "00";
+                return;
+            }
+            
+            const nextExam = upcomingExams[0];
+            nextExamNameEl.textContent = `${nextExam.subject} (${nextExam.year})`;
+            
+            const update = () => {
+                const distance = new Date(nextExam.date).getTime() - new Date().getTime();
+                
+                if (distance < 0) { 
+                    nextExamNameEl.textContent = `${nextExam.subject} - انتهى الوقت!`;
+                    daysEl.textContent = hoursEl.textContent = minutesEl.textContent = secondsEl.textContent = "00";
+                    clearInterval(countdownInterval); 
+                    renderExams(); 
+                    return; 
+                }
+                
+                const d = Math.floor(distance / 86400000);
+                const h = Math.floor((distance % 86400000) / 3600000);
+                const m = Math.floor((distance % 3600000) / 60000);
+                const s = Math.floor((distance % 60000) / 1000);
+                
+                daysEl.textContent = d.toString().padStart(2,'0');
+                hoursEl.textContent = h.toString().padStart(2,'0');
+                minutesEl.textContent = m.toString().padStart(2,'0');
+                secondsEl.textContent = s.toString().padStart(2,'0');
+            };
+            
+            countdownInterval = setInterval(update, 1000);
+            update();
+        }
+
+        document.addEventListener('DOMContentLoaded', initHomePage);
+    </script>
+</body>
+</html>

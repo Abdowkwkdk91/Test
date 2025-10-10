@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ذاكرني - صفحة المراجعة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS Variables & Theme (Kept as is for consistency) */
+        :root { --primary-color: #6a66f1; --secondary-color: #8b5cf6; --accent-color: #10b981; --danger-color: #ef4444; --warning-color: #f59e0b; --info-color: #3b82f6; --gemini-color: #8e44ad; --bg-main: #f3f4f6; --bg-section: #ffffff; --bg-alt: #e5e7eb; --text-primary: #1f2937; --text-secondary: #4b5563; --text-muted: #6b7280; --border-color: #d1d5db; --shadow-color: rgba(106, 102, 241, 0.1); --primary-shadow-color: rgba(106, 102, 241, 0.2); --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); --gradient-accent: linear-gradient(135deg, var(--accent-color) 0%, #14b8a6 100%); --gradient-danger: linear-gradient(135deg, var(--danger-color) 0%, #f76a6a 100%); --gradient-warning: linear-gradient(135deg, var(--warning-color) 0%, #f59e0b 100%); --gradient-gemini: linear-gradient(135deg, var(--gemini-color) 0%, #9b59b6 100%); --radius-md: 16px; --radius-lg: 24px; --transition: 0.3s ease; }
+        [data-theme="dark"] { --primary-color: #818cf8; --secondary-color: #a78bfa; --accent-color: #34d399; --danger-color: #f87171; --gemini-color: #a569bd; --bg-main: #111827; --bg-section: #1f2937; --bg-alt: #374151; --text-primary: #f9fafb; --text-secondary: #d1d5db; --text-muted: #9ca3af; --border-color: #4b5563; --shadow-color: rgba(0, 0, 0, 0.25); --primary-shadow-color: rgba(129, 140, 248, 0.25); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-main); color: var(--text-primary); min-height: 100vh; padding-bottom: 90px; transition: background-color var(--transition), color var(--transition); }
+        .container { max-width: 700px; margin: 0 auto; padding: 15px; } 
+        .screen { display: block; animation: fadeIn 0.5s ease-out; }
+        h1 { font-size: 2rem; color: var(--primary-color); text-align: center; margin-bottom: 25px; font-weight: 800; }
+        h2 { font-size: 1.6rem; color: var(--text-primary); position: relative; text-align: center; }
+        .section { background: var(--bg-section); margin-bottom: 20px; padding: 20px; border-radius: var(--radius-lg); box-shadow: 0 5px 15px var(--shadow-color); } 
+        .btn { background: var(--gradient-primary); color: white; border: none; padding: 10px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 700; cursor: pointer; transition: all var(--transition); display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; position: relative; overflow: hidden; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px var(--primary-shadow-color); }
+        .btn-gemini { background: var(--gradient-gemini); }
+        .btn-sm { padding: 8px 16px; font-size: 0.9rem; border-radius: 12px;}
+        .empty-state { text-align: center; padding: 50px; color: var(--text-muted); font-size: 1.1rem; }
+        .loading-skeleton { background-color: var(--bg-alt); border-radius: var(--radius-md); min-height: 100px; animation: pulse 1.5s infinite; }
+        
+        /* Navigation */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: color-mix(in srgb, var(--bg-section) 90%, transparent); backdrop-filter: blur(10px); box-shadow: 0 -5px 20px var(--shadow-color); display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; border-top: 1px solid var(--border-color); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); text-decoration: none; padding: 5px 15px; border-radius: var(--radius-md); transition: all var(--transition); cursor: pointer; flex-grow: 1; }
+        .nav-item .icon { font-size: 1.6rem; margin-bottom: 3px; }
+        .nav-item .label { font-size: 0.8rem; font-weight: 600; }
+        .nav-item.active { color: var(--primary-color); transform: translateY(-2px); }
+
+        /* Lesson Card (Main Content) */
+        .lesson-card { background: var(--bg-section); padding: 20px; border-radius: var(--radius-lg); margin-bottom: 20px; box-shadow: 0 5px 15px var(--shadow-color); border-inline-start: 5px solid var(--primary-color); }
+        .lesson-card h3 { font-size: 1.2rem; color: var(--primary-color); margin-bottom: 10px; text-align: right; }
+        .lesson-card p { color: var(--text-secondary); margin-bottom: 15px; text-align: right; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        
+        .lesson-images { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-top: 15px; }
+        .lesson-images img { width: 100%; height: 80px; object-fit: cover; border-radius: var(--radius-md); box-shadow: 0 2px 5px var(--shadow-color); cursor: pointer; transition: transform var(--transition); }
+        .lesson-images img:hover { transform: scale(1.05); opacity: 0.9; }
+        .lesson-card-actions { display: flex; justify-content: flex-start; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        
+        /* Filters */
+        .filters { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 10px; }
+        .filter-btn { background: var(--bg-alt); border: 2px solid transparent; padding: 8px 16px; border-radius: 99px; cursor: pointer; transition: all var(--transition); white-space: nowrap; font-size: 0.9rem; font-weight: 600; }
+        .filter-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+        /* Modals and Overlays */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1500; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-content { background: var(--bg-section); padding: 30px; border-radius: var(--radius-lg); width: 100%; max-width: 600px; animation: slideUpModal 0.4s ease-out; max-height: 90vh; overflow-y: auto;}
+        
+        /* Gemini Output - Crucial for Mindmap/Explanation formatting */
+        .gemini-output { 
+            white-space: pre-wrap; 
+            background-color: var(--bg-alt); 
+            padding: 15px; 
+            border-radius: var(--radius-md); 
+            margin-top: 15px; 
+            text-align: right; 
+            line-height: 1.8; 
+            font-size: 1rem;
+            direction: rtl;
+        }
+
+        /* Quiz Styling */
+        .quiz-question-container { background-color: var(--bg-alt); padding: 20px; border-radius: var(--radius-md); margin-bottom: 15px; text-align: center; }
+        .quiz-question-container p { font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; }
+        .quiz-options-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .quiz-option { display: block; margin: 0; cursor: pointer; }
+        .quiz-option label { display: block; background: var(--bg-section); border: 2px solid var(--border-color); padding: 15px 10px; border-radius: var(--radius-md); font-weight: 600; transition: all 0.2s; text-align: center; }
+        .quiz-option input[type="radio"] { display: none; }
+        .quiz-option input:checked + label { border-color: var(--primary-color); background-color: color-mix(in srgb, var(--primary-color) 15%, transparent); color: var(--primary-color); }
+        .quiz-result { margin-top: 15px; font-weight: bold; font-size: 1rem; }
+        .quiz-result.correct { color: var(--accent-color); }
+        .quiz-result.incorrect { color: var(--danger-color); }
+        
+        /* Flashcard Styling */
+        .flashcard-container { perspective: 1000px; width: 100%; height: 250px; }
+        .flashcard { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
+        .flashcard.is-flipped { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; padding: 20px; border-radius: var(--radius-lg); font-size: 1.2rem; text-align: center; }
+        .flashcard-front { background: var(--gradient-primary); color: white; }
+        .flashcard-back { background: var(--gradient-accent); color: white; transform: rotateY(180deg); }
+        .flashcard-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+        .flashcard-counter { font-weight: 700; color: var(--text-primary); }
+
+        /* Loading Overlay */
+        .loader { width: 25px; height: 25px; border: 4px solid var(--primary-color); border-bottom-color: transparent; border-radius: 50%; display: inline-block; box-sizing: border-box; animation: rotation 1s linear infinite; margin: 20px auto; display: block;}
+        #loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2500; color: white; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        #loading-overlay.show { display: flex; }
+        #loading-text { font-size: 1.2rem; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <main id="review-screen" class="screen">
+            <h1><i class="fas fa-book-reader"></i> مراجعة الدروس</h1>
+            <section class="section">
+                <h2 style="margin-bottom: 15px; font-size: 1.4rem;">تصفية حسب المادة</h2>
+                <div id="subject-filters" class="filters">
+                    <div class="loading-skeleton" style="width: 100%; height: 40px; border-radius: 99px;"></div>
+                </div>
+                <h2 style="margin-top: 25px; font-size: 1.4rem;">قائمة الدروس</h2>
+                <div id="reviewContent">
+                    <div class="loading-skeleton"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item"><span class="icon"><i class="fas fa-home"></i></span><span class="label">الرئيسية</span></a>
+        <a href="add.html" class="nav-item"><span class="icon"><i class="fas fa-plus-circle"></i></span><span class="label">إضافة</span></a>
+        <a href="review.html" class="nav-item active"><span class="icon"><i class="fas fa-book-open"></i></span><span class="label">مراجعة</span></a>
+    </nav>
+
+    <div id="lightbox" class="modal" onclick="UI.closeImage()">
+        <span class="close" style="position: absolute; top: 10px; right: 20px; font-size: 40px; color: white; cursor: pointer;">&times;</span>
+        <img src="" id="lightbox-img" alt="Enlarged lesson image" style="max-width: 90%; max-height: 90%; display: block; margin: auto;">
+        
+        <a id="download-link" class="btn btn-sm" download="Zakerni_Image.png" style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--gradient-accent); text-decoration: none; z-index: 1600;" onclick="event.stopPropagation()">
+            <i class="fas fa-download"></i> تحميل الصورة
+        </a>
+    </div>
+
+    <div id="gemini-modal" class="modal">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2 id="gemini-modal-title" style="text-align: right;"></h2>
+            <div id="gemini-modal-body"></div>
+            <div style="display:flex; justify-content:flex-end; gap: 15px; margin-top:20px;">
+                <button class="btn" onclick="UI.closeModal('gemini-modal')"><span>إغلاق</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="flashcard-modal" class="modal">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2 style="text-align: right;">بطاقات مراجعة 🃏</h2>
+            <div id="flashcard-modal-body"></div>
+            <div style="display:flex; justify-content:flex-end; gap: 15px; margin-top:20px;"><button class="btn" onclick="UI.closeModal('flashcard-modal')"><span>إغلاق</span></button></div>
+        </div>
+    </div>
+    
+    <div id="loading-overlay">
+        <div class="loading-content">
+            <div class="loader"></div>
+            <p id="loading-text" style="font-size: 1.2rem; font-weight: 600;"></p>
+        </div>
+    </div>
+
+    <script>
+        // === الثوابت والترجمات ===
+        const OPENROUTER_API_KEY = "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";
+        const currentLang = 'ar';
+        const DB_CONFIG = { name: 'ZakerniAppDB_v9', version: 1, stores: { subjects: 'subjects', lessons: 'lessons' } };
+        
+        const STABLE_MODEL = "openai/gpt-3.5-turbo"; 
+        const MAX_TOKENS = 1500; 
+
+        const TRANSLATIONS = {
+            ar: {
+                gemini_explain: "شرح المفهوم", gemini_quiz: "أنشئ اختبار", gemini_flashcards: "بطاقات مراجعة", gemini_mindmap: "خريطة ذهنية", 
+                gemini_explain_title: "شرح مبسط للمفهوم 💡", gemini_quiz_title: "اختبار قصير 🧠", mindmap_title: "الخريطة الذهنية للمفهوم 🗺️", 
+                quiz_check_answer: "تحقق من الإجابة", quiz_correct: "إجابة صحيحة! 🎉", quiz_incorrect: (ans) => `خطأ. الإجابة الصحيحة: ${ans}`,
+                alert_no_text_for_ai: "لا توجد ملاحظات نصية في هذا الدرس لاستخدام الذكاء الاصطناعي.", gemini_generating: "جاري الإنشاء بواسطة AI...",
+                gemini_error: "حدث خطأ أثناء الاتصال بالذكاء الاصطناعي.",
+                loading_lessons: "جاري تحميل الدروس...",
+                loading_subjects: "جاري تحميل المواد الدراسية..."
+            }
+        };
+
+        // === إدارة قاعدة البيانات (IndexedDB) ===
+        let db;
+        const DB = {
+            init: () => new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
+                request.onerror = e => reject(e.target.error);
+                request.onsuccess = e => { db = e.target.result; resolve(db); };
+                request.onupgradeneeded = e => {
+                    db = e.target.result;
+                    Object.values(DB_CONFIG.stores).forEach(name => {
+                        if (!db.objectStoreNames.contains(name)) {
+                            const store = db.createObjectStore(name, { keyPath: 'id', autoIncrement: true });
+                            if (name === DB_CONFIG.stores.lessons) store.createIndex('subjectId', 'subjectId', { unique: false });
+                        }
+                    });
+                };
+            }),
+            action: (storeName, mode, action) => new Promise((resolve, reject) => {
+                if (!db) return reject('DB not initialized');
+                const transaction = db.transaction(storeName, mode);
+                transaction.onerror = e => reject(e.target.error);
+                const store = transaction.objectStore(storeName);
+                action(store, resolve, reject);
+            }),
+            getAll: (store) => DB.action(store, 'readonly', (s, res) => s.getAll().onsuccess = e => res(e.target.result)),
+        };
+
+        // === إدارة واجهة المستخدم (UI) ===
+        const UI = {
+            openImage: (src) => {
+                const lightboxImg = document.getElementById('lightbox-img');
+                const lightbox = document.getElementById('lightbox');
+                const downloadLink = document.getElementById('download-link');
+                
+                if (lightboxImg && lightbox && downloadLink) {
+                    lightboxImg.src = src;
+                    // تعيين مصدر الصورة لزر التحميل
+                    downloadLink.href = src; 
+                    lightbox.classList.add('show');
+                }
+            },
+            closeImage: () => document.getElementById('lightbox').classList.remove('show'),
+            openModal: (modalId) => document.getElementById(modalId)?.classList.add('show'),
+            closeModal: (modalId) => document.getElementById(modalId)?.classList.remove('show'),
+            showLoading: (message) => {
+                document.getElementById('loading-text').textContent = message;
+                document.getElementById('loading-overlay').classList.add('show');
+            },
+            hideLoading: () => document.getElementById('loading-overlay').classList.remove('show'),
+            showAlert: (message) => { alert(message); }
+        };
+
+        // === وظائف الذكاء الاصطناعي (Gemini) ===
+        const GeminiHelper = {
+            async generateContent(prompt, isJson = false) {
+                try {
+                    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                        method: 'POST',
+                        headers: {
+                            "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            "model": STABLE_MODEL, 
+                            "messages": [{"role": "user", "content": prompt}],
+                            "max_tokens": MAX_TOKENS, 
+                            ...(isJson && {response_format: { type: "json_object" }})
+                        })
+                    });
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error.message || "فشل الاتصال بالخادم.");
+                    }
+                    const result = await response.json();
+                    const text = result?.choices?.[0]?.message?.content;
+                    if (!text) throw new Error("لم يتم توليد محتوى.");
+                    return isJson ? JSON.parse(text) : text;
+                } catch (error) {
+                    console.error("AI API Error:", error);
+                    UI.showAlert(TRANSLATIONS[currentLang].gemini_error + `:\n ${error.message}`);
+                    return null;
+                }
+            },
+            
+            async explainConcept(topic) {
+                UI.showLoading(TRANSLATIONS[currentLang].gemini_generating + ` (شرح ${topic})`);
+                try {
+                    document.getElementById('gemini-modal-title').textContent = TRANSLATIONS[currentLang].gemini_explain_title;
+                    const prompt = `أنت مدرس جزائري. اشرح ببساطة وبشكل مباشر المفهوم التالي: "${topic}". استخدم لغة عربية واضحة وراعِ طبيعة المنهج الدراسي الجزائري.`;
+                    const explanation = await this.generateContent(prompt);
+                    if (explanation) {
+                        document.getElementById('gemini-modal-body').innerHTML = `<div class="gemini-output">${explanation}</div>`;
+                        UI.openModal('gemini-modal');
+                    }
+                } finally {
+                    UI.hideLoading();
+                }
+            },
+
+            async generateQuiz(topic) {
+                UI.showLoading(TRANSLATIONS[currentLang].gemini_generating + ` (اختبار ${topic})`);
+                try {
+                    document.getElementById('gemini-modal-title').textContent = TRANSLATIONS[currentLang].gemini_quiz_title;
+                    const prompt = `أنشئ اختبارًا قصيراً من سؤال واحد حول الموضوع التالي: "${topic}". يجب أن يتضمن السؤال 4 خيارات اختيار من متعدد (أحدها 'أنا لا أعرف'). يجب أن يكون الإخراج بصيغة JSON فقط: {"questions": [{"question": "النص", "options": ["خيار1", "خيار2", "خيار3", "أنا لا أعرف"], "answer": "الخيار الصحيح"}]}`;
+                    const quizData = await this.generateContent(prompt, true);
+                    if (quizData) {
+                        this.renderQuiz(quizData);
+                        UI.openModal('gemini-modal');
+                    }
+                } finally {
+                    UI.hideLoading();
+                }
+            },
+            renderQuiz(quizData) {
+                const modalBody = document.getElementById('gemini-modal-body');
+                const questions = Array.isArray(quizData.questions) ? quizData.questions : (Array.isArray(quizData) ? quizData : []);
+
+                if (questions.length === 0) {
+                     modalBody.innerHTML = `<div class="gemini-output" style="color: var(--danger-color); font-weight: bold;">عذراً، لم يتمكن الذكاء الاصطناعي من إنشاء اختبار. يرجى المحاولة مرة أخرى بطلب أوضح.</div>`;
+                     return;
+                }
+
+                let quizHtml = '';
+                questions.forEach((q, index) => {
+                    // استخدام replace على الـ ID لضمان عدم وجود مسافات
+                    const optionsHtml = q.options.map(opt => `
+                        <div class="quiz-option">
+                            <input type="radio" id="q${index}-${opt.replace(/\s/g, '_')}" name="q${index}" value="${opt}" onclick="GeminiHelper.checkAnswer(${index}, '${q.answer.replace(/'/g, "\\'")}', this.value)">
+                            <label for="q${index}-${opt.replace(/\s/g, '_')}">${opt}</label>
+                        </div>
+                    `).join('');
+
+                    quizHtml += `
+                        <div class="quiz-question-container">
+                            <p>${q.question}</p>
+                            <div class="quiz-options-grid">${optionsHtml}</div>
+                            <div class="quiz-result" id="result-q${index}"></div>
+                        </div>`;
+                });
+                modalBody.innerHTML = quizHtml;
+            },
+            checkAnswer(qIndex, correctAnswer, selectedValue) {
+                const resultDiv = document.getElementById(`result-q${qIndex}`);
+                
+                // تعطيل الخيارات بعد الإجابة
+                document.querySelectorAll(`input[name="q${qIndex}"]`).forEach(input => input.disabled = true);
+
+                if (selectedValue === 'أنا لا أعرف') {
+                    resultDiv.textContent = 'نتمنى لك التوفيق في المراجعة! الإجابة الصحيحة: ' + correctAnswer;
+                    resultDiv.className = 'quiz-result incorrect';
+                } else if (selectedValue === correctAnswer) {
+                    resultDiv.textContent = TRANSLATIONS[currentLang].quiz_correct;
+                    resultDiv.className = 'quiz-result correct';
+                } else {
+                    resultDiv.textContent = TRANSLATIONS[currentLang].quiz_incorrect(correctAnswer);
+                    resultDiv.className = 'quiz-result incorrect';
+                }
+            },
+
+            async generateFlashcards(lessonText) {
+                if (!lessonText || lessonText.trim() === '') {
+                    return UI.showAlert(TRANSLATIONS[currentLang].alert_no_text_for_ai);
+                }
+                UI.showLoading(TRANSLATIONS[currentLang].gemini_generating + ` (بطاقات مراجعة)`);
+                try {
+                    const prompt = `بناءً على النص التالي، قم بإنشاء 5 بطاقات مراجعة (سؤال وجواب) للمساعدة على المذاكرة. النص: "${lessonText}". يجب أن يكون الإخراج بصيغة JSON فقط: {"flashcards": [{"question": "السؤال الأول", "answer": "الإجابة الأولى"}]}`;
+                    const flashcardsData = await this.generateContent(prompt, true);
+                    
+                    const cards = Array.isArray(flashcardsData.flashcards) ? flashcardsData.flashcards : (Array.isArray(flashcardsData) ? flashcardsData : []);
+
+                    if (cards.length > 0) {
+                        this.renderFlashcards(cards);
+                        UI.openModal('flashcard-modal');
+                    } else {
+                        throw new Error("لم يتم إنشاء بطاقات بالتنسيق الصحيح.");
+                    }
+                } finally {
+                    UI.hideLoading();
+                }
+            },
+            renderFlashcards(cards) {
+                const modalBody = document.getElementById('flashcard-modal-body');
+                let currentIndex = 0;
+                const updateCard = () => {
+                    const card = cards[currentIndex];
+                    modalBody.innerHTML = `<div class="flashcard-container"><div class="flashcard" onclick="this.classList.toggle('is-flipped')"><div class="flashcard-face flashcard-front">${card.question}</div><div class="flashcard-face flashcard-back">${card.answer}</div></div></div><div class="flashcard-nav"><button id="prev-card" class="btn btn-sm"><i class="fas fa-arrow-right"></i> السابق</button><span class="flashcard-counter">${currentIndex + 1} / ${cards.length}</span><button id="next-card" class="btn btn-sm">التالي <i class="fas fa-arrow-left"></i></button></div>`;
+                    document.getElementById('prev-card').onclick = () => { 
+                        if (currentIndex > 0) {
+                           currentIndex--;
+                        } else {
+                           currentIndex = cards.length - 1; 
+                        }
+                        updateCard(); 
+                    };
+                    document.getElementById('next-card').onclick = () => { 
+                        if (currentIndex < cards.length - 1) {
+                           currentIndex++;
+                        } else {
+                           currentIndex = 0; 
+                        }
+                        updateCard(); 
+                    };
+                };
+                updateCard();
+            },
+
+            async generateMindMap(topic) {
+                if (!topic || topic.trim() === '') {
+                    return UI.showAlert(TRANSLATIONS[currentLang].alert_no_text_for_ai);
+                }
+                UI.showLoading(TRANSLATIONS[currentLang].gemini_generating + ` (خريطة ذهنية لـ ${topic})`);
+                try {
+                    document.getElementById('gemini-modal-title').textContent = TRANSLATIONS[currentLang].mindmap_title;
+                    const prompt = `بصفتك خبير في طرق الدراسة، قم بإنشاء خريطة ذهنية نصية منظمة وهرمية للمفهوم التالي: "${topic}". اتبع هذا التنسيق بدقة: 1. العنوان الرئيسي 1.1. النقطة الفرعية 1.1.1. تفصيل أدق. استخدم اللغة العربية الفصحى وكن شاملاً قدر الإمكان.`;
+                    const mindMapContent = await this.generateContent(prompt);
+                    if (mindMapContent) {
+                        document.getElementById('gemini-modal-body').innerHTML = `<div class="gemini-output">${mindMapContent}</div>`;
+                        UI.openModal('gemini-modal');
+                    }
+                } finally {
+                    UI.hideLoading();
+                }
+            }
+        };
+
+        // === وظائف التحكم بالصفحة ===
+        const App = {
+            async init() {
+                UI.showLoading(TRANSLATIONS[currentLang].loading_subjects);
+                try {
+                    await DB.init();
+                    await this.updateAllDynamicUI();
+                } catch(error) {
+                    console.error("Failed to initialize the app:", error);
+                    document.getElementById('reviewContent').innerHTML = `<div class="empty-state">❌ فشل تحميل البيانات. يرجى تحديث الصفحة.</div>`;
+                } finally {
+                    UI.hideLoading();
+                }
+            },
+            async updateAllDynamicUI() {
+                const subjects = await DB.getAll(DB_CONFIG.stores.subjects);
+                if (subjects.length === 0) {
+                    document.getElementById('subject-filters').innerHTML = `<div class="empty-state" style="padding: 0;">لا توجد مواد مضافة بعد.</div>`;
+                    document.getElementById('reviewContent').innerHTML = `<div class="empty-state">ابدأ بإضافة مادة ودرس من شاشة "إضافة".</div>`;
+                    return;
+                }
+                this.renderSubjectFilters(subjects);
+                this.showAllLessons();
+            },
+            renderSubjectFilters(subjects) {
+                const container = document.getElementById('subject-filters');
+                container.innerHTML = '';
+                const fragment = document.createDocumentFragment();
+                const allBtn = document.createElement('button');
+                allBtn.className = 'filter-btn active';
+                allBtn.textContent = 'الكل';
+                allBtn.onclick = () => App.filterLessonsBySubject('all', allBtn);
+                fragment.appendChild(allBtn);
+                subjects.forEach(s => {
+                    const filterBtn = document.createElement('button');
+                    filterBtn.className = 'filter-btn';
+                    filterBtn.textContent = `${s.subject} (${s.year})`;
+                    filterBtn.onclick = () => App.filterLessonsBySubject(s.id, filterBtn);
+                    fragment.appendChild(filterBtn);
+                });
+                container.appendChild(fragment);
+            },
+            filterLessonsBySubject(subjectId, targetButton) {
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                if (targetButton) {
+                    targetButton.classList.add('active');
+                }
+                this.showAllLessons(subjectId);
+            },
+            async showAllLessons(subjectId = 'all') {
+                const container = document.getElementById('reviewContent');
+                container.innerHTML = '<div class="loading-skeleton"></div>';
+                UI.showLoading(TRANSLATIONS[currentLang].loading_lessons);
+                
+                try {
+                    const lessons = await DB.getAll(DB_CONFIG.stores.lessons);
+                    const subjects = await DB.getAll(DB_CONFIG.stores.subjects);
+                    const subjectsMap = new Map(subjects.map(s => [s.id, s]));
+                    
+                    const filteredLessons = subjectId === 'all' 
+                        ? lessons 
+                        : lessons.filter(l => l.subjectId === subjectId);
+                    
+                    if (filteredLessons.length === 0) {
+                        container.innerHTML = `<div class="empty-state">لا توجد دروس لعرضها في هذه المادة.</div>`;
+                        return;
+                    }
+                    
+                    container.innerHTML = '';
+                    const fragment = document.createDocumentFragment();
+                    
+                    filteredLessons.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(lesson => {
+                        const subject = subjectsMap.get(lesson.subjectId);
+                        const fullTopic = subject ? `${subject.subject} (${subject.year}) - ${lesson.desc}` : lesson.desc;
+                        const safeTopic = fullTopic.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                        
+                        const card = document.createElement('div');
+                        card.className = 'lesson-card';
+                        
+                        const hasText = lesson.desc && lesson.desc.trim() !== '';
+                        
+                        const imagesHTML = lesson.images.length > 0 ? 
+                            `<div class="lesson-images">${lesson.images.map(img => `<img src="${img}" onclick="UI.openImage(this.src)" alt="صورة الدرس">`).join('')}</div>` : '';
+
+                        const actionsHTML = hasText ? `
+                            <div class="lesson-card-actions">
+                                <button class="btn btn-gemini btn-sm" onclick="GeminiHelper.explainConcept('${safeTopic}')">✨ <span>${TRANSLATIONS[currentLang].gemini_explain}</span></button>
+                                <button class="btn btn-gemini btn-sm" onclick="GeminiHelper.generateQuiz('${safeTopic}')">🧠 <span>${TRANSLATIONS[currentLang].gemini_quiz}</span></button>
+                                <button class="btn btn-gemini btn-sm" onclick="GeminiHelper.generateFlashcards('${safeTopic}')">🃏 <span>${TRANSLATIONS[currentLang].gemini_flashcards}</span></button>
+                                <button class="btn btn-gemini btn-sm" onclick="GeminiHelper.generateMindMap('${safeTopic}')">🗺️ <span>${TRANSLATIONS[currentLang].gemini_mindmap}</span></button> 
+                            </div>` : `<div class="lesson-card-actions"><p style="color: var(--danger-color); font-weight: 600;">لا يوجد نص لاستخدام أدوات الذكاء الاصطناعي.</p></div>`;
+                            
+                        card.innerHTML = `
+                            <h3>${subject ? `${subject.subject} (${subject.year})` : 'درس غير مصنف'}</h3>
+                            ${lesson.desc ? `<p>${lesson.desc}</p>` : '<p style="font-style: italic; color: var(--text-muted);">لا يوجد وصف نصي لهذا الدرس.</p>'}
+                            ${imagesHTML}
+                            ${actionsHTML}`;
+                        
+                        fragment.appendChild(card);
+                    });
+                    container.appendChild(fragment);
+                } catch (error) {
+                    console.error("Error rendering lessons:", error);
+                    container.innerHTML = `<div class="empty-state">❌ حدث خطأ أثناء عرض الدروس.</div>`;
+                } finally {
+                    UI.hideLoading();
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => App.init());
+    </script>
+</body>
+</html>

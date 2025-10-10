@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>ذاكرني - صفحة الإضافة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* الألوان والثيم */
+        :root { --primary-color: #6a66f1; --secondary-color: #8b5cf6; --accent-color: #10b981; --danger-color: #ef4444; --warning-color: #f59e0b; --info-color: #3b82f6; --gemini-color: #8e44ad; --bg-main: #f3f4f6; --bg-section: #ffffff; --bg-alt: #e5e7eb; --text-primary: #1f2937; --text-secondary: #4b5563; --text-muted: #6b7280; --border-color: #d1d5db; --shadow-color: rgba(106, 102, 241, 0.1); --primary-shadow-color: rgba(106, 102, 241, 0.2); --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%); --gradient-accent: linear-gradient(135deg, var(--accent-color) 0%, #14b8a6 100%); --gradient-danger: linear-gradient(135deg, var(--danger-color) 0%, #f76a6a 100%); --gradient-warning: linear-gradient(135deg, var(--warning-color) 0%, #f59e0b 100%); --gradient-gemini: linear-gradient(135deg, var(--gemini-color) 0%, #9b59b6 100%); --radius-md: 16px; --radius-lg: 24px; --transition: 0.3s ease; }
+        [data-theme="dark"] { --primary-color: #818cf8; --secondary-color: #a78bfa; --accent-color: #34d399; --danger-color: #f87171; --gemini-color: #a569bd; --bg-main: #111827; --bg-section: #1f2937; --bg-alt: #374151; --text-primary: #f9fafb; --text-secondary: #d1d5db; --text-muted: #9ca3af; --border-color: #4b5563; --shadow-color: rgba(0, 0, 0, 0.25); --primary-shadow-color: rgba(129, 140, 248, 0.25); }
+
+        /* الأساسيات والخط */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-main); color: var(--text-primary); min-height: 100vh; line-height: 1.7; padding-bottom: 90px; transition: background-color var(--transition), color var(--transition); }
+        .container { max-width: 700px; /* جعل الحاوية أضيق للهواتف */ margin: 0 auto; padding: 20px 15px; }
+        .screen { display: block; animation: fadeIn 0.5s ease-out; }
+        h1, h2 { text-align: center; margin-bottom: 25px; font-weight: 800; }
+        h1 { font-size: 2rem; color: var(--primary-color); }
+        h2 { font-size: 1.6rem; color: var(--text-primary); position: relative; }
+
+        /* الأقسام (البطاقات) */
+        .section { background: var(--bg-section); margin-bottom: 25px; padding: clamp(1.5rem, 5vw, 2rem); border-radius: var(--radius-lg); box-shadow: 0 10px 30px var(--shadow-color); transition: all var(--transition); }
+
+        /* حقول النموذج */
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; font-size: 0.95rem; }
+        input, select, textarea { width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: var(--radius-md); font-size: 1rem; font-family: 'Cairo', sans-serif; background: var(--bg-alt); color: var(--text-primary); transition: all var(--transition); appearance: none; /* لإزالة المظهر الافتراضي لبعض المتصفحات */ }
+        input[type="date"], input[type="time"] { text-align: right; } /* لتحسين مظهر حقول التاريخ والوقت في RTL */
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 4px var(--primary-shadow-color); background: var(--bg-section); }
+        select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236a66f1'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 1rem center; background-size: 1.5em 1.5em; padding-left: 2.5rem; } /* سهم مخصص للـ Select */
+        .date-time-group { display: flex; gap: 15px; }
+        .date-time-group > div { flex: 1; }
+
+        /* الأزرار */
+        .btn { background: var(--gradient-primary); color: white; border: none; padding: 14px 20px; border-radius: var(--radius-md); font-size: 1rem; font-weight: 700; cursor: pointer; transition: all var(--transition); display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; width: 100%; margin-top: 15px; position: relative; overflow: hidden; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px var(--primary-shadow-color); }
+        .btn:disabled { background: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; opacity: 0.7; }
+        .btn-accent { background: var(--gradient-accent); box-shadow: 0 8px 20px color-mix(in srgb, var(--accent-color) 30%, transparent); }
+        .btn-accent:hover { box-shadow: 0 8px 20px color-mix(in srgb, var(--accent-color) 60%, transparent); }
+        .btn-danger { background: var(--gradient-danger); }
+        .btn-sm { padding: 8px 16px; font-size: 0.9rem; border-radius: 12px; width: auto !important; margin-top: 0 !important;}
+
+        /* التنقل السفلي */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: color-mix(in srgb, var(--bg-section) 90%, transparent); backdrop-filter: blur(10px); box-shadow: 0 -5px 20px var(--shadow-color); display: flex; justify-content: space-around; padding: 8px 0; z-index: 100; border-top: 1px solid var(--border-color); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; color: var(--text-muted); text-decoration: none; padding: 5px 15px; border-radius: var(--radius-md); transition: all var(--transition); cursor: pointer; flex-grow: 1; }
+        .nav-item .icon { font-size: 1.6rem; margin-bottom: 3px; }
+        .nav-item .label { font-size: 0.8rem; font-weight: 600; }
+        .nav-item.active { color: var(--primary-color); transform: translateY(-2px); }
+
+        /* معاينة الصور */
+        #image-preview-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; margin-top: 15px; padding: 10px; border: 1px dashed var(--border-color); border-radius: var(--radius-md); background: var(--bg-alt); }
+        .preview-image-wrapper { position: relative; }
+        .preview-image-wrapper img { width: 100%; height: 80px; object-fit: cover; border-radius: var(--radius-md); }
+        .preview-image-wrapper .remove-img-btn { position: absolute; top: -8px; right: -8px; background: var(--danger-color); color: white; border: 2px solid var(--bg-section); border-radius: 50%; width: 28px; height: 28px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.4); transition: all var(--transition); z-index: 10; }
+        .preview-image-wrapper .remove-img-btn:hover { transform: scale(1.15); background: #c13a3a; }
+        
+        /* الرسوم المتحركة */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <main id="add-lesson-screen" class="screen">
+            <section class="section">
+                <h2><i class="fas fa-flask"></i> إضافة مادة جديدة</h2>
+                <div class="form-group">
+                    <label for="year">السنة الدراسية <span style="color: var(--danger-color);">*</span></label>
+                    <input id="year" placeholder="مثال: 3 متوسط" required>
+                </div>
+                <div class="form-group">
+                    <label for="subject">اسم المادة <span style="color: var(--danger-color);">*</span></label>
+                    <input id="subject" placeholder="مثال: رياضيات" required>
+                </div>
+                <div class="form-group">
+                    <label for="examDate">تاريخ الامتحان القادم (اختياري)</label>
+                    <input type="date" id="examDate">
+                </div>
+                <button class="btn" onclick="addSubject()"><span><i class="fas fa-plus-circle"></i></span> <span>إضافة المادة</span></button>
+            </section>
+
+            <section class="section">
+                <h2><i class="fas fa-file-alt"></i> إضافة درس جديد</h2>
+                <div class="form-group">
+                    <label for="subjectList">اختر المادة</label>
+                    <select id="subjectList" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="lessonDesc">وصف الدرس/عنوانه (اختياري)</label>
+                    <textarea id="lessonDesc" placeholder="أدخل وصفاً أو عنواناً للدرس..." rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="imageInput">صور الدرس (إجباري)</label>
+                    <button class="btn btn-sm btn-accent" onclick="document.getElementById('imageInput').click()" style="width: auto; margin-top: 0;">
+                        <span><i class="fas fa-camera"></i></span> <span>اختيار الصور</span>
+                    </button>
+                    <input type="file" id="imageInput" accept="image/*" multiple style="display:none;">
+                </div>
+                <div id="image-preview-container">
+                    </div>
+                <button class="btn btn-accent" onclick="addLesson()"><span><i class="fas fa-bookmark"></i></span> <span>حفظ الدرس والصور</span></button>
+            </section>
+
+            <section class="section">
+                <h2><i class="fas fa-lightbulb"></i> إضافة ملاحظة سريعة</h2>
+                <div class="form-group">
+                    <label for="quickNoteInput">ملاحظتك</label>
+                    <textarea id="quickNoteInput" placeholder="اكتب شيئاً لتتذكره..." rows="4"></textarea>
+                </div>
+                <div class="date-time-group">
+                    <div class="form-group">
+                        <label for="noteDate">تاريخ التذكير (اختياري)</label>
+                        <input type="date" id="noteDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="noteTime">وقت التذكير (اختياري)</label>
+                        <input type="time" id="noteTime">
+                    </div>
+                </div>
+                <button class="btn" onclick="addNote()"><span><i class="fas fa-sticky-note"></i></span> <span>إضافة الملاحظة</span></button>
+            </section>
+        </main>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <span class="icon"><i class="fas fa-home"></i></span>
+            <span class="label">الرئيسية</span>
+        </a>
+        <a href="add.html" class="nav-item active">
+            <span class="icon"><i class="fas fa-plus-circle"></i></span>
+            <span class="label">إضافة</span>
+        </a>
+        <a href="review.html" class="nav-item">
+            <span class="icon"><i class="fas fa-book-open"></i></span>
+            <span class="label">مراجعة</span>
+        </a>
+    </nav>
+    <script>
+        // هنا يتم تضمين جميع أكواد JS المطلوبة لهذه الصفحة
+        let db = null;
+        let selectedFiles = [];
+        const DB_CONFIG = { name: 'ZakerniAppDB_v9', version: 1, stores: { subjects: 'subjects', lessons: 'lessons', notes: 'notes' } };
+
+        const DB = {
+            init: () => new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_CONFIG.name, DB_CONFIG.version);
+                request.onerror = e => reject(e.target.error);
+                request.onsuccess = e => { db = e.target.result; resolve(db); };
+                request.onupgradeneeded = e => {
+                    db = e.target.result;
+                    Object.values(DB_CONFIG.stores).forEach(name => {
+                        if (!db.objectStoreNames.contains(name)) {
+                            const store = db.createObjectStore(name, { keyPath: 'id', autoIncrement: true });
+                            if (name === DB_CONFIG.stores.lessons) store.createIndex('subjectId', 'subjectId', { unique: false });
+                        }
+                    });
+                };
+            }),
+            action: (storeName, mode, action) => new Promise((resolve, reject) => {
+                if (!db) return reject('DB not initialized');
+                const transaction = db.transaction(storeName, mode);
+                transaction.onerror = e => reject(e.target.error);
+                const store = transaction.objectStore(storeName);
+                action(store, resolve, reject);
+            }),
+            add: (store, data) => DB.action(store, 'readwrite', (s, res) => s.add(data).onsuccess = e => res(e.target.result)),
+            getAll: (store) => DB.action(store, 'readonly', (s, res) => s.getAll().onsuccess = e => res(e.target.result)),
+        };
+
+        async function initAddPage() {
+            await DB.init();
+            renderSubjectDropdown();
+            document.getElementById('imageInput').addEventListener('change', handleImageSelection);
+        }
+
+        async function renderSubjectDropdown() {
+            const subjectList = document.getElementById("subjectList");
+            const subjects = await DB.getAll(DB_CONFIG.stores.subjects);
+            const fragment = document.createDocumentFragment();
+            subjectList.innerHTML = '';
+            if (subjects.length > 0) {
+                const defaultOption = document.createElement('option');
+                defaultOption.value = "";
+                defaultOption.textContent = `-- اختر المادة --`;
+                fragment.appendChild(defaultOption);
+                subjects.forEach(s => {
+                    const option = document.createElement('option');
+                    option.value = s.id;
+                    option.textContent = `${s.subject} (${s.year})`;
+                    fragment.appendChild(option);
+                });
+            } else {
+                const emptyOption = document.createElement('option');
+                emptyOption.value = "";
+                emptyOption.textContent = "-- أضف مادة أولاً --";
+                fragment.appendChild(emptyOption);
+            }
+            subjectList.appendChild(fragment);
+        }
+
+        async function addSubject() {
+            const year = document.getElementById("year").value.trim();
+            const subject = document.getElementById("subject").value.trim();
+            if (!year || !subject) {
+                 alert('يرجى ملء حقلي "السنة الدراسية" و "اسم المادة".');
+                 return;
+            }
+            const date = document.getElementById("examDate").value;
+            await DB.add(DB_CONFIG.stores.subjects, { year, subject, date: date || null });
+            alert('تمت إضافة المادة بنجاح!');
+            document.getElementById("year").value = '';
+            document.getElementById("subject").value = '';
+            document.getElementById("examDate").value = '';
+            renderSubjectDropdown();
+        }
+
+        async function addLesson() {
+            const subjectId = parseInt(document.getElementById("subjectList").value);
+            const desc = document.getElementById("lessonDesc").value.trim();
+            
+            if (isNaN(subjectId) || subjectId === 0) {
+                alert('الرجاء اختيار المادة لحفظ الدرس.');
+                return;
+            }
+            if (selectedFiles.length === 0) {
+                alert('الرجاء اختيار صورة واحدة على الأقل للدرس.');
+                return;
+            }
+
+            const imagePromises = selectedFiles.map(file => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = e => reject(e);
+                reader.readAsDataURL(file);
+            }));
+            
+            const imagesDataUrl = await Promise.all(imagePromises);
+            await DB.add(DB_CONFIG.stores.lessons, { subjectId, desc, images: imagesDataUrl, createdAt: new Date() });
+            
+            alert('تم حفظ الدرس بنجاح!');
+            document.getElementById("subjectList").value = '';
+            document.getElementById("lessonDesc").value = '';
+            document.getElementById("imageInput").value = '';
+            document.getElementById("image-preview-container").innerHTML = '';
+            selectedFiles = [];
+        }
+
+        // تم تحديث الدالة لتشمل حفظ التاريخ والوقت الاختياريين
+        async function addNote() {
+            const content = document.getElementById('quickNoteInput').value.trim();
+            const date = document.getElementById('noteDate').value; // التاريخ
+            const time = document.getElementById('noteTime').value; // الوقت
+
+            if (!content) {
+                 alert('يرجى كتابة ملاحظة لحفظها.');
+                 return;
+            }
+            
+            // تخزين الملاحظة مع التاريخ والوقت (إذا كانا موجودين)
+            await DB.add(DB_CONFIG.stores.notes, { 
+                content, 
+                createdAt: new Date(),
+                reminderDate: date || null, // حقل اختياري
+                reminderTime: time || null  // حقل اختياري
+            });
+            
+            alert('تمت إضافة الملاحظة بنجاح!');
+            document.getElementById('quickNoteInput').value = '';
+            document.getElementById('noteDate').value = '';
+            document.getElementById('noteTime').value = '';
+        }
+
+        function handleImageSelection(event) {
+            const newFiles = Array.from(event.target.files);
+            selectedFiles.push(...newFiles);
+            renderImagePreviews();
+        }
+
+        function renderImagePreviews() {
+            const previewContainer = document.getElementById('image-preview-container');
+            previewContainer.innerHTML = '';
+            
+            if (selectedFiles.length === 0) {
+                previewContainer.innerHTML = '<div class="empty-state">لا توجد صور مختارة.</div>';
+                previewContainer.style.gridTemplateColumns = '1fr';
+                return;
+            }
+            previewContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(80px, 1fr))';
+            
+            selectedFiles.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'preview-image-wrapper';
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.alt = `صورة الدرس ${index + 1}`;
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'remove-img-btn';
+                    removeBtn.innerHTML = '&times;';
+                    removeBtn.setAttribute('aria-label', `حذف الصورة رقم ${index + 1}`);
+                    
+                    removeBtn.onclick = () => {
+                        selectedFiles.splice(index, 1);
+                        // بعد الحذف، يجب إعادة عرض القائمة كاملة بترتيبها الجديد
+                        renderImagePreviews();
+                    };
+                    
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(removeBtn);
+                    previewContainer.appendChild(wrapper);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initAddPage);
+    </script>
+</body>
+</html>
